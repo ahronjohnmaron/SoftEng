@@ -338,6 +338,31 @@
             throw new Error('Authentication required');
         }
 
+    // ====================================================
+    // AUTO LOGOUT AFTER 5 MINUTES OF INACTIVITY
+    // ====================================================
+    const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
+    let inactivityTimer;
+
+    function logoutUser() {
+        alert("You have been logged out due to inactivity.");
+        localStorage.removeItem('loggedInUser'); // clear session
+        window.location.href = 'faculty_login.html'; // redirect to login page
+    }
+
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(logoutUser, INACTIVITY_LIMIT);
+    }
+
+    // Listen for user activity to reset timer
+    window.onload = resetInactivityTimer;
+    document.onmousemove = resetInactivityTimer;
+    document.onkeypress = resetInactivityTimer;
+    document.onclick = resetInactivityTimer;
+    document.onscroll = resetInactivityTimer;
+    document.ontouchstart = resetInactivityTimer;
+
         // --- 2. CROPPER FUNCTIONS ---
         function initCropper(imageSrc) {
             cropSection.classList.remove('hidden');
@@ -655,3 +680,4 @@
     </script>
 </body>
 </html>
+
