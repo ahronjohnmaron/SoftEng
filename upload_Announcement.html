@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" type="image/x-icon" href="CCSICTLOGOCROP.png">
     <title>Upload Announcement - Department Communication Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src='https://unpkg.com/tesseract.js@5/dist/tesseract.min.js'></script>
+    <!-- Cropper.js CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
@@ -29,121 +32,264 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Critical: Prevent image overflow */
+        #cropperImage {
+            max-width: 100% !important;
+            max-height: 500px;
+            display: block;
+            height: auto;
+        }
+        
+        /* Cropper container constraints */
+        .cropper-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .cropper-container {
+            max-width: 100% !important;
+            max-height: 500px !important;
+            margin: 0 auto;
+        }
+        
+        /* Ensure canvas doesn't overflow */
+        .cropper-canvas,
+        .cropper-drag-box,
+        .cropper-crop-box,
+        .cropper-modal {
+            max-width: 100% !important;
+        }
+        
+        /* Touch optimization */
+        .cropper-crop-box,
+        .cropper-view-box {
+            touch-action: none;
+        }
+        
+        /* Mobile-specific adjustments */
+        @media (max-width: 640px) {
+            #cropperImage {
+                max-height: 400px;
+            }
+            
+            .cropper-container {
+                max-height: 400px !important;
+            }
+            
+            video {
+                max-height: 50vh;
+                object-fit: cover;
+            }
+            
+            /* Larger touch targets for mobile */
+            button {
+                min-height: 44px;
+            }
+            
+            /* Prevent zoom on input focus */
+            input, textarea, select {
+                font-size: 16px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #cropperImage {
+                max-height: 300px;
+            }
+            
+            .cropper-container {
+                max-height: 300px !important;
+            }
+        }
+        
+        /* Preview image container */
+        .image-preview-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            max-height: 500px;
+            background: #0a0a0a;
+            overflow: hidden;
+        }
+        
+        .image-preview-container img {
+            max-width: 100%;
+            max-height: 500px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+        
+        @media (max-width: 640px) {
+            .image-preview-container {
+                max-height: 400px;
+            }
+            
+            .image-preview-container img {
+                max-height: 400px;
+            }
+        }
+        
+        /* Smooth transitions */
+        .transition-height {
+            transition: max-height 0.3s ease-in-out;
+        }
+        
+        /* Loading state */
+        .loading {
+            pointer-events: none;
+            opacity: 0.6;
         }
     </style>
 </head>
-<body class="bg-ph-black text-ph-text min-h-screen p-3 sm:p-6">
-
-    <div class="max-w-2xl mx-auto space-y-4 sm:space-y-6">
-        <!-- Header -->
-        <div class="bg-ph-dark rounded-xl p-4 sm:p-6 shadow-lg border border-ph-gray">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                <h1 class="flex items-center gap-2 font-bold text-lg sm:text-xl text-ph-orange">
-                    <span class="text-2xl">📂</span>Upload Announcement
-                </h1>
-                <a href="faculty_Dashboard.html"
-                    class="bg-ph-orange hover:bg-yellow-500 text-ph-black rounded-lg px-4 py-2 text-sm font-bold transition-all duration-300 no-underline w-full sm:w-auto text-center">← Back</a>
+<body class="bg-ph-black text-ph-text min-h-screen">
+    
+    <div class="w-full px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+        <div class="max-w-4xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+            
+            <!-- Header -->
+            <div class="bg-ph-dark rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg border border-ph-gray">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3">
+                    <h1 class="flex items-center gap-2 font-bold text-base sm:text-lg md:text-xl text-ph-orange">
+                        <span class="text-xl sm:text-2xl">📂</span>
+                        <span class="hidden sm:inline">Upload Announcement</span>
+                        <span class="sm:hidden">Upload</span>
+                    </h1>
+                    <a href="faculty_Dashboard.html"
+                        class="bg-ph-orange hover:bg-yellow-500 active:bg-yellow-600 text-ph-black rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold transition-all duration-300 no-underline w-full sm:w-auto text-center">← Back to Dashboard</a>
+                </div>
             </div>
-        </div>
 
-        <!-- Capture or Upload -->
-        <div class="bg-ph-dark rounded-xl p-4 sm:p-6 shadow-lg border border-ph-gray">
-             <h3 class="text-ph-orange mb-4 text-base sm:text-lg font-bold">Capture or Upload</h3>
-             
-             <!-- Camera Section -->
-             <div class="bg-ph-black border border-ph-gray rounded-lg p-4 mb-4">
-                 <div class="flex items-center gap-3 mb-4">
-                     <div class="w-10 h-10 bg-ph-orange/20 rounded-lg flex items-center justify-center">
-                         <span class="text-xl">📷</span>
+            <!-- Capture or Upload -->
+            <div class="bg-ph-dark rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg border border-ph-gray">
+                 <h3 class="text-ph-orange mb-3 sm:mb-4 text-sm sm:text-base md:text-lg font-bold">Capture or Upload</h3>
+                 
+                 <!-- Camera Section -->
+                 <div class="bg-ph-black border border-ph-gray rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
+                     <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                         <div class="w-8 h-8 sm:w-10 sm:h-10 bg-ph-orange/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                             <span class="text-lg sm:text-xl">📷</span>
+                         </div>
+                         <span class="font-semibold text-ph-text text-sm sm:text-base">Use Camera</span>
                      </div>
-                     <span class="font-semibold text-ph-text">Use Camera</span>
-                 </div>
-                 <button id="startCamera" class="w-full bg-ph-orange hover:bg-yellow-500 text-ph-black font-bold py-3 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5">Start Camera</button>
-                 <video id="video" autoplay playsinline class="w-full rounded-lg mt-4 hidden border-2 border-ph-gray"></video>
-                 <canvas id="canvas" class="hidden"></canvas>
-                 <div class="flex gap-3 mt-4">
-                     <button id="capturePhoto" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-lg transition-all duration-300 hidden">📸 Take Photo</button>
-                     <button id="stopCamera" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition-all duration-300 hidden">❌ Stop</button>
-                 </div>
-             </div>
-             
-             <!-- Upload Section -->
-             <div class="bg-ph-black border border-ph-gray rounded-lg p-4">
-                 <div class="flex items-center gap-3 mb-4">
-                     <div class="w-10 h-10 bg-ph-orange/20 rounded-lg flex items-center justify-center">
-                         <span class="text-xl">📁</span>
+                     <button id="startCamera" class="w-full bg-ph-orange hover:bg-yellow-500 active:bg-yellow-600 text-ph-black font-bold py-2.5 sm:py-3 rounded-lg transition-all duration-300 transform active:scale-95 text-sm sm:text-base">Start Camera</button>
+                     <video id="video" autoplay playsinline class="w-full rounded-lg mt-3 sm:mt-4 hidden border-2 border-ph-gray"></video>
+                     <canvas id="canvas" class="hidden"></canvas>
+                     <div class="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
+                         <button id="capturePhoto" class="flex-1 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-bold py-2 sm:py-2.5 rounded-lg transition-all duration-300 hidden text-xs sm:text-sm">📸 <span class="hidden xs:inline">Take</span> Photo</button>
+                         <button id="stopCamera" class="flex-1 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold py-2 sm:py-2.5 rounded-lg transition-all duration-300 hidden text-xs sm:text-sm">❌ Stop</button>
                      </div>
-                     <span class="font-semibold text-ph-text">Upload File</span>
                  </div>
-                 <label for="imageInput" class="block w-full bg-ph-orange hover:bg-yellow-500 text-ph-black font-bold py-3 rounded-lg text-center cursor-pointer transition-all duration-300 transform hover:-translate-y-0.5">Choose Image</label>
-                 <input type="file" id="imageInput" accept="image/*" class="hidden">
-                 <p class="text-center mt-3 text-xs text-ph-text-secondary">JPG, PNG, GIF</p>
-             </div>
-             <div id="imagePreview" class="mt-4"></div>
-        </div>
-
-        <!-- Text Preview -->
-        <div class="bg-ph-dark rounded-xl p-4 sm:p-6 shadow-lg border border-ph-gray">
-            <h3 class="text-ph-orange mb-3 text-base sm:text-lg font-bold">Text extracted from image</h3>
-            <div class="bg-ph-black border border-ph-gray rounded-lg p-4 min-h-[100px] flex items-center justify-center">
-                <span class="text-ph-text-secondary text-sm text-center" id="extractedTextPreview">No text extracted yet</span>
+                 
+                 <!-- Upload Section -->
+                 <div class="bg-ph-black border border-ph-gray rounded-lg p-3 sm:p-4">
+                     <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                         <div class="w-8 h-8 sm:w-10 sm:h-10 bg-ph-orange/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                             <span class="text-lg sm:text-xl">📁</span>
+                         </div>
+                         <span class="font-semibold text-ph-text text-sm sm:text-base">Upload File</span>
+                     </div>
+                     <label for="imageInput" class="block w-full bg-ph-orange hover:bg-yellow-500 active:bg-yellow-600 text-ph-black font-bold py-2.5 sm:py-3 rounded-lg text-center cursor-pointer transition-all duration-300 transform active:scale-95 text-sm sm:text-base">Choose Image</label>
+                     <input type="file" id="imageInput" accept="image/*" class="hidden">
+                     <p class="text-center mt-2 sm:mt-3 text-xs text-ph-text-secondary">JPG, PNG, GIF</p>
+                 </div>
             </div>
-        </div>
 
-        <!-- Extract Text -->
-        <div class="bg-ph-dark rounded-xl p-4 sm:p-6 shadow-lg border border-ph-gray">
-            <h3 class="text-ph-orange mb-3 text-base sm:text-lg font-bold">Extract Text</h3>
-            <button id="extractText" class="w-full bg-ph-orange hover:bg-yellow-500 disabled:bg-ph-gray disabled:cursor-not-allowed text-ph-black font-bold py-3 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5" disabled>Extract Text from Image</button>
-            <div id="progressContainer" class="mt-4 hidden">
-                <div class="bg-ph-gray h-3 rounded-full overflow-hidden mb-3">
-                    <div class="bg-ph-orange h-3 w-0 transition-all duration-300" id="progressBar"></div>
+            <!-- Crop Section -->
+            <div id="cropSection" class="bg-ph-dark rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg border border-ph-gray hidden">
+                <h3 class="text-ph-orange mb-3 sm:mb-4 text-sm sm:text-base md:text-lg font-bold">Crop Image</h3>
+                <div class="bg-ph-black border border-ph-gray rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
+                    <div class="cropper-wrapper">
+                        <img id="cropperImage" src="" alt="Image to crop">
+                    </div>
                 </div>
-                <div class="text-ph-text-secondary font-semibold text-sm text-center" id="progressText" aria-live="polite">Starting OCR...</div>
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <button id="cropImageBtn" class="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-bold py-2.5 sm:py-3 rounded-lg transition-all duration-300 transform active:scale-95 text-xs sm:text-sm md:text-base">✂️ Apply Crop</button>
+                    <button id="cancelCrop" class="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold py-2.5 sm:py-3 rounded-lg transition-all duration-300 transform active:scale-95 text-xs sm:text-sm md:text-base">Cancel</button>
+                </div>
             </div>
-        </div>
 
-        <!-- Create Announcement Form -->
-        <div class="bg-ph-dark rounded-xl p-4 sm:p-6 shadow-lg border border-ph-gray">
-            <h3 class="text-ph-orange mb-4 text-base sm:text-lg font-bold">Create Announcement</h3>
-            <form id="announcementForm" class="space-y-4">
-                <div>
-                    <label for="announcementTitle" class="block mb-2 text-ph-text font-semibold text-sm">Announcement Title:</label>
-                    <input type="text" id="announcementTitle" placeholder="Enter announcement title..." required class="w-full px-4 py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text placeholder-ph-text-secondary focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all">
+            <!-- Image Preview with Actions -->
+            <div id="imagePreviewSection" class="bg-ph-dark rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg border border-ph-gray hidden">
+                <h3 class="text-ph-orange mb-3 sm:mb-4 text-sm sm:text-base md:text-lg font-bold">Current Image</h3>
+                <div id="imagePreview" class="mb-3 sm:mb-4 rounded-lg image-preview-container"></div>
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <button id="reCropBtn" class="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-2.5 sm:py-3 rounded-lg transition-all duration-300 transform active:scale-95 text-xs sm:text-sm md:text-base">✂️ Re-Crop</button>
+                    <button id="newImageBtn" class="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold py-2.5 sm:py-3 rounded-lg transition-all duration-300 transform active:scale-95 text-xs sm:text-sm md:text-base">🔄 New Image</button>
                 </div>
-                <div>
-                    <label for="announcementContent" class="block mb-2 text-ph-text font-semibold text-sm">Content:</label>
-                    <textarea id="announcementContent" rows="6" placeholder="Content will appear here after text extraction..." required class="w-full px-4 py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text placeholder-ph-text-secondary focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 resize-none transition-all"></textarea>
-                </div>
-                <div>
-                    <label for="announcementDate" class="block mb-2 text-ph-text font-semibold text-sm">Schedule Date:</label>
-                    <input type="date" id="announcementDate" required class="w-full px-4 py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all">
-                </div>
-                <div>
-                    <label for="targetAudience" class="block mb-2 text-ph-text font-semibold text-sm">Target Audience:</label>
-                    <select id="targetAudience" required class="w-full px-4 py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all cursor-pointer">
-                        <option value="">Select Target Audience</option>
-                        <option value="all">All</option>
-                        <option value="faculty">Faculty Only</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="category" class="block mb-2 text-ph-text font-semibold text-sm">Category:</label>
-                    <select id="category" required class="w-full px-4 py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all cursor-pointer">
-                        <option value="">Select Category</option>
-                        <option value="Emergency">Emergency</option>
-                        <option value="Memo">Memo</option>
-                        <option value="Notices">Notices</option>
-                        <option value="Deadline">Deadline</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg text-base sm:text-lg">📤 Create Announcement</button>
-            </form>
-        </div>
+            </div>
 
-        <!-- Success Message -->
-        <div id="results" class="bg-green-600/20 border-2 border-green-600 rounded-xl p-4 sm:p-6 text-center text-green-400 hidden" aria-live="polite">
-            <h3 class="font-bold text-base sm:text-lg mb-2">✅ Announcement Created!</h3>
-            <p class="text-sm">Your announcement has been saved to the database.</p>
+            <!-- Text Preview -->
+            <div class="bg-ph-dark rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg border border-ph-gray">
+                <h3 class="text-ph-orange mb-2 sm:mb-3 text-sm sm:text-base md:text-lg font-bold">Extracted Text Preview</h3>
+                <div class="bg-ph-black border border-ph-gray rounded-lg p-3 sm:p-4 min-h-[80px] sm:min-h-[100px] flex items-center justify-center">
+                    <span class="text-ph-text-secondary text-xs sm:text-sm text-center" id="extractedTextPreview">No text extracted yet</span>
+                </div>
+            </div>
+
+            <!-- Extract Text -->
+            <div class="bg-ph-dark rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg border border-ph-gray">
+                <h3 class="text-ph-orange mb-2 sm:mb-3 text-sm sm:text-base md:text-lg font-bold">Extract Text</h3>
+                <button id="extractText" class="w-full bg-ph-orange hover:bg-yellow-500 active:bg-yellow-600 disabled:bg-ph-gray disabled:cursor-not-allowed text-ph-black font-bold py-2.5 sm:py-3 rounded-lg transition-all duration-300 transform active:scale-95 text-sm sm:text-base" disabled>Extract Text from Image</button>
+                <div id="progressContainer" class="mt-3 sm:mt-4 hidden">
+                    <div class="bg-ph-gray h-2 sm:h-3 rounded-full overflow-hidden mb-2 sm:mb-3">
+                        <div class="bg-ph-orange h-2 sm:h-3 w-0 transition-all duration-300" id="progressBar"></div>
+                    </div>
+                    <div class="text-ph-text-secondary font-semibold text-xs sm:text-sm text-center" id="progressText" aria-live="polite">Starting OCR...</div>
+                </div>
+            </div>
+
+            <!-- Create Announcement Form -->
+            <div class="bg-ph-dark rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg border border-ph-gray">
+                <h3 class="text-ph-orange mb-3 sm:mb-4 text-sm sm:text-base md:text-lg font-bold">Create Announcement</h3>
+                <form id="announcementForm" class="space-y-3 sm:space-y-4">
+                    <div>
+                        <label for="announcementTitle" class="block mb-1.5 sm:mb-2 text-ph-text font-semibold text-xs sm:text-sm">Announcement Title:</label>
+                        <input type="text" id="announcementTitle" placeholder="Enter announcement title..." required class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text placeholder-ph-text-secondary focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all">
+                    </div>
+                    <div>
+                        <label for="announcementContent" class="block mb-1.5 sm:mb-2 text-ph-text font-semibold text-xs sm:text-sm">Content:</label>
+                        <textarea id="announcementContent" rows="5" placeholder="Content will appear here after text extraction..." required class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text placeholder-ph-text-secondary focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 resize-none transition-all"></textarea>
+                    </div>
+                    <div>
+                        <label for="announcementDate" class="block mb-1.5 sm:mb-2 text-ph-text font-semibold text-xs sm:text-sm">Schedule Date:</label>
+                        <input type="date" id="announcementDate" required class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all">
+                    </div>
+                    <div>
+                        <label for="targetAudience" class="block mb-1.5 sm:mb-2 text-ph-text font-semibold text-xs sm:text-sm">Target Audience:</label>
+                        <select id="targetAudience" required class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all cursor-pointer">
+                            <option value="">Select Target Audience</option>
+                            <option value="all">All</option>
+                            <option value="faculty">Faculty Only</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="category" class="block mb-1.5 sm:mb-2 text-ph-text font-semibold text-xs sm:text-sm">Category:</label>
+                        <select id="category" required class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all cursor-pointer">
+                            <option value="">Select Category</option>
+                            <option value="Emergency">Emergency</option>
+                            <option value="Memo">Memo</option>
+                            <option value="Notices">Notices</option>
+                            <option value="Deadline">Deadline</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-bold py-2.5 sm:py-3 md:py-3.5 rounded-lg transition-all duration-300 transform active:scale-95 hover:shadow-lg text-sm sm:text-base md:text-lg">📤 Create Announcement</button>
+                </form>
+            </div>
+
+            <!-- Success Message -->
+            <div id="results" class="bg-green-600/20 border-2 border-green-600 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 text-center text-green-400 hidden" aria-live="polite">
+                <h3 class="font-bold text-sm sm:text-base md:text-lg mb-1 sm:mb-2">✅ Announcement Created!</h3>
+                <p class="text-xs sm:text-sm">Your announcement has been saved to the database.</p>
+            </div>
+            
         </div>
     </div>
 
@@ -154,7 +300,10 @@
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
         let currentImage = null;
+        let currentImageSrc = null;
+        let originalImageSrc = null;
         let stream = null;
+        let cropper = null;
 
         const startCameraBtn = document.getElementById('startCamera'), video = document.getElementById('video'),
               canvas = document.getElementById('canvas'), captureBtn = document.getElementById('capturePhoto'),
@@ -162,35 +311,168 @@
               imagePreview = document.getElementById('imagePreview'), extractTextBtn = document.getElementById('extractText'),
               extractedTextPreview = document.getElementById('extractedTextPreview'), progressContainer = document.getElementById('progressContainer'),
               progressBar = document.getElementById('progressBar'), progressText = document.getElementById('progressText'),
-              announcementForm = document.getElementById('announcementForm'), results = document.getElementById('results');
+              announcementForm = document.getElementById('announcementForm'), results = document.getElementById('results'),
+              cropSection = document.getElementById('cropSection'), cropperImage = document.getElementById('cropperImage'),
+              cropImageBtn = document.getElementById('cropImageBtn'), cancelCrop = document.getElementById('cancelCrop'),
+              imagePreviewSection = document.getElementById('imagePreviewSection'), reCropBtn = document.getElementById('reCropBtn'),
+              newImageBtn = document.getElementById('newImageBtn');
         
-    // ============================================
-    // PAGE PROTECTION - REDIRECT IF NOT LOGGED IN
-    // ============================================
-    function protectPage() {
-        const loggedInUser = localStorage.getItem('loggedInUser');
-        
-        if (!loggedInUser) {
-            console.log('🔒 No session - redirecting to login');
-            window.location.href = 'faculty_login.html';
-            return false;
+        // ============================================
+        // PAGE PROTECTION - REDIRECT IF NOT LOGGED IN
+        // ============================================
+        function protectPage() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            
+            if (!loggedInUser) {
+                console.log('🔒 No session - redirecting to login');
+                window.location.href = 'faculty_login.html';
+                return false;
+            }
+            
+            console.log('✅ User authenticated');
+            return true;
         }
-        
-        console.log('✅ User authenticated');
-        return true;
-    }
 
-    // Run protection immediately
-    if (!protectPage()) {
-        throw new Error('Authentication required');
-    }
+        // Run protection immediately
+        if (!protectPage()) {
+            throw new Error('Authentication required');
+        }
+
+        // --- 2. CROPPER FUNCTIONS ---
+        function initCropper(imageSrc) {
+            cropSection.classList.remove('hidden');
+            imagePreviewSection.classList.add('hidden');
+            cropperImage.src = imageSrc;
+            
+            // Scroll to cropper on mobile
+            setTimeout(() => {
+                cropSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+            
+            if (cropper) {
+                cropper.destroy();
+            }
+            
+            // Wait for image to load before initializing cropper
+            cropperImage.onload = function() {
+                cropper = new Cropper(cropperImage, {
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 0.8,
+                    responsive: true,
+                    restore: true,
+                    background: true,
+                    guides: true,
+                    center: true,
+                    highlight: true,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false,
+                    checkCrossOrigin: false,
+                    checkOrientation: true,
+                    modal: true,
+                    scalable: true,
+                    zoomable: true,
+                    zoomOnTouch: true,
+                    zoomOnWheel: true,
+                    wheelZoomRatio: 0.1,
+                    minContainerWidth: 200,
+                    minContainerHeight: 200,
+                });
+            };
+        }
+
+        function destroyCropper() {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            cropSection.classList.add('hidden');
+        }
+
+        // Apply crop and show preview with FULL QUALITY
+        cropImageBtn.addEventListener('click', () => {
+            if (!cropper) return;
+            
+            cropImageBtn.classList.add('loading');
+            cropImageBtn.textContent = 'Processing...';
+            
+            setTimeout(() => {
+                const cropData = cropper.getData();
+                const imageData = cropper.getImageData();
+                
+                const hiddenImage = new Image();
+                hiddenImage.src = originalImageSrc;
+                
+                hiddenImage.onload = function() {
+                    const scaleX = hiddenImage.naturalWidth / imageData.naturalWidth;
+                    const scaleY = hiddenImage.naturalHeight / imageData.naturalHeight;
+                    
+                    const cropCanvas = document.createElement('canvas');
+                    cropCanvas.width = Math.ceil(cropData.width * scaleX);
+                    cropCanvas.height = Math.ceil(cropData.height * scaleY);
+                    
+                    const ctx = cropCanvas.getContext('2d');
+                    
+                    ctx.drawImage(
+                        hiddenImage,
+                        cropData.x * scaleX,
+                        cropData.y * scaleY,
+                        cropData.width * scaleX,
+                        cropData.height * scaleY,
+                        0,
+                        0,
+                        cropCanvas.width,
+                        cropCanvas.height
+                    );
+                    
+                    cropCanvas.toBlob((blob) => {
+                        currentImage = blob;
+                        currentImageSrc = cropCanvas.toDataURL('image/jpeg', 1.0);
+                        displayImage(currentImageSrc);
+                        destroyCropper();
+                        imagePreviewSection.classList.remove('hidden');
+                        extractTextBtn.disabled = false;
+                        cropImageBtn.classList.remove('loading');
+                        cropImageBtn.textContent = '✂️ Apply Crop';
+                        
+                        setTimeout(() => {
+                            imagePreviewSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
+                    }, 'image/jpeg', 1.0);
+                };
+            }, 50);
+        });
+
+        cancelCrop.addEventListener('click', () => {
+            destroyCropper();
+            if (currentImageSrc) {
+                imagePreviewSection.classList.remove('hidden');
+            }
+        });
+
+        reCropBtn.addEventListener('click', () => {
+            if (currentImageSrc) {
+                initCropper(currentImageSrc);
+            }
+        });
+
+        newImageBtn.addEventListener('click', () => {
+            resetAll();
+        });
 
         // --- 3. CORE LOGIC (Camera, Upload, OCR) ---
         document.getElementById('announcementDate').valueAsDate = new Date();
         
         startCameraBtn.addEventListener('click', async () => { 
             try { 
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    } 
+                }); 
                 video.srcObject = stream; 
                 video.classList.remove('hidden'); 
                 captureBtn.classList.remove('hidden'); 
@@ -207,12 +489,10 @@
             canvas.width = video.videoWidth; 
             canvas.height = video.videoHeight; 
             context.drawImage(video, 0, 0); 
-            canvas.toBlob(blob => { 
-                currentImage = blob; 
-                displayImage(canvas.toDataURL()); 
-                stopCamera(); 
-                extractTextBtn.disabled = false; 
-            }); 
+            const imageSrc = canvas.toDataURL('image/jpeg', 1.0);
+            originalImageSrc = imageSrc;
+            stopCamera();
+            initCropper(imageSrc);
         });
         
         stopCameraBtn.addEventListener('click', stopCamera);
@@ -231,18 +511,17 @@
         imageInput.addEventListener('change', (e) => { 
             const file = e.target.files[0]; 
             if (file) { 
-                currentImage = file; 
                 const reader = new FileReader(); 
                 reader.onload = (e) => { 
-                    displayImage(e.target.result); 
-                    extractTextBtn.disabled = false; 
+                    originalImageSrc = e.target.result;
+                    initCropper(e.target.result);
                 }; 
                 reader.readAsDataURL(file); 
             } 
         });
         
         function displayImage(src) { 
-            imagePreview.innerHTML = `<img src="${src}" alt="Selected image" class="w-full rounded-lg shadow-lg border-2 border-ph-gray">`; 
+            imagePreview.innerHTML = `<img src="${src}" alt="Selected image" class="w-auto h-auto max-w-full object-contain rounded-lg shadow-lg border-2 border-ph-gray">`; 
         }
         
         extractTextBtn.addEventListener('click', async () => { 
@@ -253,6 +532,11 @@
             progressContainer.classList.remove('hidden'); 
             extractTextBtn.disabled = true; 
             extractTextBtn.textContent = 'Processing...'; 
+            
+            setTimeout(() => {
+                progressContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+            
             try { 
                 const result = await Tesseract.recognize(currentImage, 'eng', { 
                     logger: m => { 
@@ -265,12 +549,16 @@
                 }); 
                 const extractedText = result.data.text; 
                 const lines = extractedText.split('\n').filter(line => line.trim()); 
-                extractedTextPreview.textContent = extractedText.substring(0, 100) + (extractedText.length > 100 ? '...' : '') || 'No text found'; 
+                extractedTextPreview.textContent = extractedText.substring(0, 150) + (extractedText.length > 150 ? '...' : '') || 'No text found'; 
                 if (lines.length > 0) { 
                     document.getElementById('announcementTitle').value = lines[0].trim(); 
                     document.getElementById('announcementContent').value = extractedText; 
                 } 
                 progressContainer.classList.add('hidden'); 
+                
+                setTimeout(() => {
+                    announcementForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
             } catch (error) { 
                 console.error('OCR Error:', error); 
                 alert('Error extracting text. Please try again.'); 
@@ -281,9 +569,26 @@
             } 
         });
 
-        // --- 4. FORM SUBMISSION TO SUPABASE ---
+        // --- 4. RESET FUNCTION ---
+        function resetAll() {
+            currentImage = null;
+            currentImageSrc = null;
+            originalImageSrc = null;
+            imagePreview.innerHTML = '';
+            extractedTextPreview.textContent = 'No text extracted yet';
+            extractTextBtn.disabled = true;
+            imagePreviewSection.classList.add('hidden');
+            destroyCropper();
+            imageInput.value = '';
+        }
+
+        // --- 5. FORM SUBMISSION TO SUPABASE ---
         announcementForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const submitBtn = announcementForm.querySelector('button[type="submit"]');
+            submitBtn.classList.add('loading');
+            submitBtn.textContent = 'Creating...';
             
             const announcementData = {
                 title: document.getElementById('announcementTitle').value,
@@ -300,23 +605,46 @@
             if (error) {
                 alert('Error creating announcement: ' + error.message);
                 console.error(error);
+                submitBtn.classList.remove('loading');
+                submitBtn.textContent = '📤 Create Announcement';
             } else {
                 console.log('Announcement created:', data);
                 results.classList.remove('hidden');
+                results.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                 setTimeout(() => {
                     announcementForm.reset();
-                    imagePreview.innerHTML = '';
-                    extractedTextPreview.textContent = 'No text extracted yet';
+                    resetAll();
                     results.classList.add('hidden');
-                    extractTextBtn.disabled = true;
-                    currentImage = null;
+                    submitBtn.classList.remove('loading');
+                    submitBtn.textContent = '📤 Create Announcement';
                     document.getElementById('announcementDate').valueAsDate = new Date();
                 }, 3000);
             }
         });
 
-        // --- 5. INITIAL PAGE LOAD ---
+        // --- 6. RESPONSIVE ADJUSTMENTS ---
+        function handleResize() {
+            if (cropper) {
+                cropper.resize();
+            }
+        }
+
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(handleResize, 250);
+        });
+
+        // Prevent double-tap zoom on buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                btn.click();
+            }, { passive: false });
+        });
+
+        // --- 7. INITIAL PAGE LOAD ---
         document.addEventListener('DOMContentLoaded', () => {
             protectPage();
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
