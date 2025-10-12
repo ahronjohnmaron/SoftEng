@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="CCSICTLOGOCROP.png">
+    <title>Adding Member</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ph-orange': '#ffa31a',
+                        'ph-orange-hover': '#ff9500',
+                        'ph-dark': '#1b1b1b',
+                        'ph-black': '#000000',
+                        'ph-gray': '#2a2a2a',
+                        'ph-light-gray': '#999999',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: #1b1b1b;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none; 
+            border-color: #ffa31a;
+            box-shadow: 0 0 0 3px rgba(255, 163, 26, 0.15);
+        }
+        .form-input::placeholder {
+            color: #666;
+        }
+        .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23ffa31a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+
+    <div class="relative w-full max-w-md mx-auto">
+        <!-- Back Button - Responsive positioning -->
+        <a href="faculty_Dashboard.html" class="absolute top-0 left-0 -translate-y-14 sm:-translate-y-16 lg:left-[-170px] lg:top-1/2 lg:-translate-y-1/2 flex items-center gap-2 bg-ph-black text-ph-light-gray px-3 py-2 rounded-lg shadow-lg border border-ph-gray hover:bg-ph-gray hover:text-white transition-all duration-300 group text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="transition-transform group-hover:-translate-x-1" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            <span class="font-semibold">Dashboard</span>
+        </a>
+        
+        <!-- Main Form Container -->
+        <div class="bg-ph-black p-6 sm:p-8 rounded-2xl shadow-2xl w-full border border-ph-gray">
+            <!-- Header Section -->
+            <div class="text-center mb-6">
+                <div class="mx-auto w-16 h-16 sm:w-18 sm:h-18 bg-ph-gray rounded-full flex items-center justify-center mb-3 border-2 border-ph-orange overflow-hidden shadow-lg">
+                    <img src="CCSICTLOGOCROP.png" alt="Company Logo" class="w-full h-full object-cover">
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-ph-orange mb-1">Adding Faculty Member</h1>
+                <p class="text-ph-light-gray text-xs sm:text-sm">Fill in the details below</p>
+            </div>
+
+            <!-- Form -->
+            <form id="facultyForm" class="space-y-4">
+                <!-- Full Name -->
+                <div>
+                    <label for="fullName" class="block text-xs font-semibold text-gray-300 mb-1.5">Full Name</label>
+                    <input 
+                        type="text" 
+                        id="fullName" 
+                        class="form-input w-full px-3 py-2.5 bg-ph-dark border-2 border-ph-gray rounded-lg text-white transition-all duration-300 text-sm" 
+                        placeholder="Enter full name"
+                        required
+                    >
+                </div>
+
+                <!-- User Type -->
+                <div>
+                    <label for="userType" class="block text-xs font-semibold text-gray-300 mb-1.5">User Type</label>
+                    <select 
+                        id="userType" 
+                        class="form-select w-full px-3 py-2.5 bg-ph-dark border-2 border-ph-gray rounded-lg appearance-none transition-all duration-300 text-white text-sm cursor-pointer" 
+                        required
+                    >
+                        <option value="" disabled selected class="text-gray-500">Select a user type</option>
+                        <option value="faculty" class="bg-ph-dark text-white">Faculty</option>
+                        <option value="officer" class="bg-ph-dark text-white">Officer</option>
+                    </select>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-xs font-semibold text-gray-300 mb-1.5">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        class="form-input w-full px-3 py-2.5 bg-ph-dark border-2 border-ph-gray rounded-lg text-white transition-all duration-300 text-sm" 
+                        placeholder="example@domain.com"
+                        required
+                    >
+                </div>
+
+                <!-- Assign Password -->
+                <div>
+                    <label for="assignPassword" class="block text-xs font-semibold text-gray-300 mb-1.5">Assign Password</label>
+                    <input 
+                        type="password" 
+                        id="assignPassword" 
+                        class="form-input w-full px-3 py-2.5 bg-ph-dark border-2 border-ph-gray rounded-lg text-white transition-all duration-300 text-sm" 
+                        placeholder="Enter password"
+                        required
+                    >
+                </div>
+
+                <!-- Admin Password -->
+                <div>
+                    <label for="adminPassword" class="block text-xs font-semibold text-gray-300 mb-1.5">Administrator Password</label>
+                    <input 
+                        type="password" 
+                        id="adminPassword" 
+                        class="form-input w-full px-3 py-2.5 bg-ph-dark border-2 border-ph-gray rounded-lg text-white transition-all duration-300 text-sm" 
+                        placeholder="Enter admin password"
+                        required
+                    >
+                </div>
+
+                <!-- Message Area -->
+                <div id="messageArea" class="text-center text-xs sm:text-sm font-semibold min-h-[20px] transition-all duration-300"></div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button 
+                        type="button" 
+                        id="clearButton" 
+                        class="w-full py-2.5 px-4 bg-ph-dark text-gray-300 font-bold rounded-lg hover:bg-ph-gray hover:text-white border-2 border-ph-gray transition-all duration-300 text-sm"
+                    >
+                        Clear
+                    </button>
+                    <button 
+                        type="submit" 
+                        class="w-full py-2.5 px-4 bg-ph-orange text-black font-bold rounded-lg hover:bg-ph-orange-hover hover:shadow-lg hover:shadow-ph-orange/30 transition-all duration-300 transform hover:-translate-y-0.5 text-sm"
+                    >
+                        Add Member
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer Text -->
+        <p class="text-center text-ph-light-gray text-xs mt-4">Department Cummunication Hub</p>
+    </div>
+
+    <script>
+        const facultyForm = document.getElementById('facultyForm');
+        const clearButton = document.getElementById('clearButton');
+        const messageArea = document.getElementById('messageArea');
+
+        const supabaseUrl = 'https://dqtictujkhxultwoaqaw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxdGljdHVqa2h4dWx0d29hcWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyOTU1MjksImV4cCI6MjA3Mzg3MTUyOX0.DsnJZ9ylCBlTeVp_KdgRq71cV0f7MojOfuWg1MVGS5I';
+        
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+
+
+    // ============================================
+    // PAGE PROTECTION - REDIRECT IF NOT LOGGED IN
+    // ============================================
+    function protectPage() {
+        const loggedInUser = localStorage.getItem('loggedInUser');
+        
+        if (!loggedInUser) {
+            console.log('🔒 No session - redirecting to login');
+            window.location.href = 'faculty_login.html';
+            return false;
+        }
+        
+        console.log('✅ User authenticated');
+        return true;
+    }
+
+    // Run protection immediately
+    if (!protectPage()) {
+        throw new Error('Authentication required');
+    }
+
+
+
+
+
+
+
+        facultyForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const submitButton = facultyForm.querySelector('button[type="submit"]');
+            displayMessage('', 'none');
+            
+            const fullName = document.getElementById('fullName').value;
+            const userType = document.getElementById('userType').value;
+            const email = document.getElementById('email').value;
+            const assignPassword = document.getElementById('assignPassword').value;
+            const adminPassword = document.getElementById('adminPassword').value;
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Verifying...';
+            submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+
+            try {
+                // STEP 1: VERIFY THE ADMIN PASSWORD
+                const { data: adminCheck, error: adminError } = await supabaseClient
+                    .from('admins')
+                    .select('password')
+                    .eq('password', adminPassword);
+
+                if (adminError) throw adminError;
+
+                if (adminCheck && adminCheck.length > 0) {
+                    submitButton.textContent = 'Adding...';
+
+                    // STEP 2: ADD THE NEW MEMBER
+                    const { data: insertData, error: insertError } = await supabaseClient
+                        .from('members')
+                        .insert([{
+                            full_name: fullName,
+                            user_type: userType,
+                            email: email,
+                            password: assignPassword
+                        }]);
+                    
+                    if (insertError) throw insertError;
+
+                    displayMessage('✓ Member Added Successfully!', 'success');
+                    facultyForm.reset();
+
+                } else {
+                    displayMessage('✗ Incorrect Admin Password', 'error');
+                }
+
+            } catch (error) {
+                displayMessage(`✗ Error: ${error.message}`, 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Add Member';
+                submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+            }
+        });
+
+        clearButton.addEventListener('click', () => {
+            facultyForm.reset();
+            displayMessage('', 'none');
+        });
+
+        function displayMessage(message, type) {
+            messageArea.textContent = message;
+            messageArea.className = 'text-center text-xs sm:text-sm font-semibold min-h-[20px] transition-all duration-300';
+            
+            if (type === 'success') {
+                messageArea.classList.add('text-ph-orange');
+            } else if (type === 'error') {
+                messageArea.classList.add('text-red-500');
+            }
+        }
+    </script>
+</body>
+</html>

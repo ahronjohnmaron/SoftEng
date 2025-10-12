@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="CCSICTLOGOCROP.png">
+    <title>Department Communication Hub - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ph-orange': '#ffa31a',
+                        'ph-orange-hover': '#ff9500',
+                        'ph-dark': '#1b1b1b',
+                        'ph-black': '#000000',
+                        'ph-gray': '#2a2a2a',
+                        'ph-light-gray': '#999999',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-image-section {
+            background-image: url('BG.jpg');
+            background-position: center;
+        }
+        
+        @media (max-width: 1024px) {
+            .bg-image-section {
+                background-attachment: scroll;
+            }
+        }
+    </style>
+</head>
+<body class="bg-ph-dark">
+
+    <div class="relative min-h-screen lg:flex">
+
+        <!-- Left Side - Background Image Section -->
+        <div class="absolute inset-0 bg-image-section lg:relative lg:w-1/2 xl:w-3/5">
+            <!-- Dark overlay for mobile -->
+            <div class="absolute inset-0 bg-gradient-to-br from-ph-black/80 via-ph-black/70 to-ph-black/60 lg:bg-gradient-to-br lg:from-ph-black/60 lg:via-ph-black/40 lg:to-transparent"></div>
+            
+            <!-- Content visible on desktop -->
+            <div class="relative hidden h-full flex-col justify-between p-8 xl:p-12 text-white lg:flex">
+                <div class="text-xl xl:text-2xl font-bold text-ph-orange">
+                    🌐 A centralized web-based Communication Hub Platform
+                </div>
+                <div class="max-w-lg">
+                    <h1 class="text-3xl xl:text-4xl 2xl:text-5xl font-bold leading-tight mb-4">Welcome to the <span class="text-ph-orange">Communication Hub</span></h1>
+                    <p class="text-base xl:text-lg opacity-90">Connecting students and faculty seamlessly with real-time announcements and updates.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Section -->
+        <div class="relative z-10 flex min-h-screen items-center justify-center p-4 sm:p-6 lg:w-1/2 xl:w-2/5 lg:bg-ph-dark">
+            <div class="w-full max-w-md text-center">
+                
+                <!-- Logo -->
+                <div class="mx-auto w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mb-6">
+                    <img src="CCSICTLOGOCROP.png" alt="Department Logo" class="w-full h-full object-cover rounded-full border-4 border-ph-orange shadow-2xl shadow-ph-orange/50">
+                </div>
+                
+                <!-- Headings -->
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-ph-orange mb-2">Department</h2>
+                <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-3">Communication Hub</h3>
+                <p class="text-ph-light-gray text-sm sm:text-base mb-8 lg:mb-10">Select your role to continue</p>
+
+                <!-- Login Buttons -->
+                <div class="space-y-4">
+                    <a href="testdashboard.html" class="group block w-full font-bold py-3.5 sm:py-4 px-6 rounded-xl
+                                     bg-ph-orange text-ph-black border-2 border-ph-orange
+                                     hover:bg-ph-orange-hover hover:border-ph-orange-hover hover:shadow-lg hover:shadow-ph-orange/30
+                                     focus:outline-none focus:ring-4 focus:ring-ph-orange/50
+                                     transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]
+                                     text-base sm:text-lg">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            STUDENT
+                        </span>
+                    </a>
+                    
+                    <a href="faculty_login.html" class="group block w-full font-bold py-3.5 sm:py-4 px-6 rounded-xl
+                                     bg-ph-dark text-white border-2 border-ph-gray
+                                     hover:bg-ph-gray hover:border-ph-orange hover:shadow-lg hover:shadow-ph-orange/20
+                                     focus:outline-none focus:ring-4 focus:ring-ph-orange/50
+                                     transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]
+                                     text-base sm:text-lg">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            TEACHER
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Footer Text -->
+                <div class="mt-8 lg:mt-12">
+                    <p class="text-ph-light-gray text-xs sm:text-sm">
+                        © 2025 Department Communication Hub. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

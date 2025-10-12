@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Communication Hub - Login</title>
+    <link rel="icon" type="image/x-icon" href="CCSICTLOGOCROP.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ph-orange': '#ffa31a',
+                        'ph-orange-hover': '#ff9500',
+                        'ph-dark': '#1b1b1b',
+                        'ph-black': '#000000',
+                        'ph-gray': '#2a2a2a',
+                        'ph-light-gray': '#999999',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-image-section {
+            background-image: url('BG.jpg');
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="bg-ph-dark">
+
+    <div class="flex min-h-screen flex-col lg:flex-row">
+        <!-- Login Form Section -->
+        <div class="w-full lg:w-2/5 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-ph-dark order-2 lg:order-1">
+            <div class="w-full max-w-md text-center">
+                
+                <!-- Logo -->
+                <div class="mx-auto w-20 h-20 sm:w-24 sm:h-24 mb-6">
+                    <img src="CCSICTLOGOCROP.png" alt="Department Logo" class="w-full h-full object-cover rounded-full border-4 border-ph-orange shadow-2xl shadow-ph-orange/50">
+                </div>
+                
+                <!-- Headings -->
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-ph-orange mb-2">Department</h2>
+                <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-3">Communication Hub</h3>
+                <p class="text-ph-light-gray text-sm sm:text-base mb-8">Faculty Login Portal</p>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="space-y-5">
+                    <div>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            id="email" 
+                            placeholder="Email Address" 
+                            required 
+                            autocomplete="email"
+                            class="w-full px-4 py-3 sm:py-3.5 bg-ph-black border-2 border-ph-gray rounded-lg text-white placeholder-ph-light-gray focus:outline-none focus:border-ph-orange focus:ring-4 focus:ring-ph-orange/30 transition-all duration-300 text-sm sm:text-base"
+                        >
+                    </div>
+                    <div>
+                        <input 
+                            type="password" 
+                            name="password" 
+                            id="password" 
+                            placeholder="Password" 
+                            required 
+                            autocomplete="current-password"
+                            class="w-full px-4 py-3 sm:py-3.5 bg-ph-black border-2 border-ph-gray rounded-lg text-white placeholder-ph-light-gray focus:outline-none focus:border-ph-orange focus:ring-4 focus:ring-ph-orange/30 transition-all duration-300 text-sm sm:text-base"
+                        >
+                    </div>
+                    <div>
+                        <button 
+                            type="submit" 
+                            class="w-full bg-ph-orange hover:bg-ph-orange-hover text-black font-bold py-3.5 sm:py-4 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-ph-orange/30 text-base sm:text-lg"
+                        >
+                            Login
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Message Area -->
+                <div id="messageArea" class="mt-4 text-center text-sm sm:text-base font-semibold text-red-500 min-h-[24px]"></div>
+                
+                <!-- Back Link -->
+                <div class="mt-6">
+                    <a href="landing_Page.html" class="inline-flex items-center gap-2 text-sm sm:text-base text-ph-light-gray hover:text-ph-orange transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Go Back
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- Background Image Section -->
+        <div class="hidden lg:flex w-3/5 flex-col justify-between p-8 xl:p-12 bg-image-section bg-ph-black text-white order-1 lg:order-2 relative">
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-br from-ph-black/60 via-ph-black/40 to-transparent"></div>
+            
+            <!-- Content -->
+            <div class="relative text-xl xl:text-2xl font-bold text-ph-orange">
+                🌐 A centralized web-based Communication Hub Platform
+            </div>
+            <div class="relative max-w-lg">
+                <h1 class="text-3xl xl:text-4xl 2xl:text-5xl font-bold leading-tight mb-4">
+                    Welcome to the <span class="text-ph-orange">Communication Hub</span>
+                </h1>
+                <p class="text-base xl:text-lg opacity-90">Connecting students and faculty seamlessly with real-time announcements and updates.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const loginForm = document.getElementById('loginForm');
+    const messageArea = document.getElementById('messageArea');
+
+    const supabaseUrl = 'https://dqtictujkhxultwoaqaw.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxdGljdHVqa2h4dWx0d29hcWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyOTU1MjksImV4cCI6MjA3Mzg3MTUyOX0.DsnJZ9ylCBlTeVp_KdgRq71cV0f7MojOfuWg1MVGS5I';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Check if already logged in
+    const loggedInUser = localStorage.getItem('loggedInUser');
+    if (loggedInUser) {
+        window.location.href = 'faculty_Dashboard.html';
+    }
+
+    loginForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        messageArea.textContent = '';
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Logging in...';
+        submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+
+        try {
+            // Query the 'members' table for an exact match
+            const { data, error } = await supabaseClient
+                .from('members')
+                .select('*')
+                .eq('email', email)
+                .eq('password', password)
+                .single();
+
+            if (error || !data) {
+                messageArea.textContent = '✗ Invalid email or password';
+                messageArea.classList.remove('text-ph-orange');
+                messageArea.classList.add('text-red-500');
+                console.error('Login failed:', error);
+                return;
+            }
+
+            // Login successful
+            messageArea.textContent = '✓ Login Successful!';
+            messageArea.classList.remove('text-red-500');
+            messageArea.classList.add('text-ph-orange');
+            
+            // Save user session to localStorage
+            localStorage.setItem('loggedInUser', JSON.stringify({
+                email: data.email,
+                name: data.name || data.email,
+                role: data.role || 'faculty',
+                loginTime: new Date().toISOString()
+            }));
+            
+            console.log('✅ Login successful:', data.email);
+            
+            setTimeout(() => {
+                window.location.href = 'faculty_Dashboard.html';
+            }, 1000);
+
+        } catch (err) {
+            messageArea.textContent = `✗ An error occurred: ${err.message}`;
+            messageArea.classList.remove('text-ph-orange');
+            messageArea.classList.add('text-red-500');
+            console.error('Error:', err);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Login';
+            submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+    });
+</script>
+
+</body>
+</html>

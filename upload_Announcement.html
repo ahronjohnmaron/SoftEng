@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="CCSICTLOGOCROP.png">
+    <title>Upload Announcement - Department Communication Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src='https://unpkg.com/tesseract.js@5/dist/tesseract.min.js'></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ph-orange': '#FFA500',
+                        'ph-black': '#000000',
+                        'ph-dark': '#1C1C1C',
+                        'ph-gray': '#2C2C2C',
+                        'ph-text': '#FFFFFF',
+                        'ph-text-secondary': '#B3B3B3',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-ph-black text-ph-text min-h-screen p-3 sm:p-6">
+
+    <div class="max-w-2xl mx-auto space-y-4 sm:space-y-6">
+        <!-- Header -->
+        <div class="bg-ph-dark rounded-xl p-4 sm:p-6 shadow-lg border border-ph-gray">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <h1 class="flex items-center gap-2 font-bold text-lg sm:text-xl text-ph-orange">
+                    <span class="text-2xl">📂</span>Upload Announcement
+                </h1>
+                <a href="faculty_Dashboard.html"
+                    class="bg-ph-orange hover:bg-yellow-500 text-ph-black rounded-lg px-4 py-2 text-sm font-bold transition-all duration-300 no-underline w-full sm:w-auto text-center">← Back</a>
+            </div>
+        </div>
+
+        <!-- Capture or Upload -->
+        <div class="bg-ph-dark rounded-xl p-4 sm:p-6 shadow-lg border border-ph-gray">
+             <h3 class="text-ph-orange mb-4 text-base sm:text-lg font-bold">Capture or Upload</h3>
+             
+             <!-- Camera Section -->
+             <div class="bg-ph-black border border-ph-gray rounded-lg p-4 mb-4">
+                 <div class="flex items-center gap-3 mb-4">
+                     <div class="w-10 h-10 bg-ph-orange/20 rounded-lg flex items-center justify-center">
+                         <span class="text-xl">📷</span>
+                     </div>
+                     <span class="font-semibold text-ph-text">Use Camera</span>
+                 </div>
+                 <button id="startCamera" class="w-full bg-ph-orange hover:bg-yellow-500 text-ph-black font-bold py-3 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5">Start Camera</button>
+                 <video id="video" autoplay playsinline class="w-full rounded-lg mt-4 hidden border-2 border-ph-gray"></video>
+                 <canvas id="canvas" class="hidden"></canvas>
+                 <div class="flex gap-3 mt-4">
+                     <button id="capturePhoto" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-lg transition-all duration-300 hidden">📸 Take Photo</button>
+                     <button id="stopCamera" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition-all duration-300 hidden">❌ Stop</button>
+                 </div>
+             </div>
+             
+             <!-- Upload Section -->
+             <div class="bg-ph-black border border-ph-gray rounded-lg p-4">
+                 <div class="flex items-center gap-3 mb-4">
+                     <div class="w-10 h-10 bg-ph-orange/20 rounded-lg flex items-center justify-center">
+                         <span class="text-xl">📁</span>
+                     </div>
+                     <span class="font-semibold text-ph-text">Upload File</span>
+                 </div>
+                 <label for="imageInput" class="block w-full bg-ph-orange hover:bg-yellow-500 text-ph-black font-bold py-3 rounded-lg text-center cursor-pointer transition-all duration-300 transform hover:-translate-y-0.5">Choose Image</label>
+                 <input type="file" id="imageInput" accept="image/*" class="hidden">
+                 <p class="text-center mt-3 text-xs text-ph-text-secondary">JPG, PNG, GIF</p>
+             </div>
+             <div id="imagePreview" class="mt-4"></div>
+        </div>
+
+        <!-- Text Preview -->
+        <div class="bg-ph-dark rounded-xl p-4 sm:p-6 shadow-lg border border-ph-gray">
+            <h3 class="text-ph-orange mb-3 text-base sm:text-lg font-bold">Text extracted from image</h3>
+            <div class="bg-ph-black border border-ph-gray rounded-lg p-4 min-h-[100px] flex items-center justify-center">
+                <span class="text-ph-text-secondary text-sm text-center" id="extractedTextPreview">No text extracted yet</span>
+            </div>
+        </div>
+
+        <!-- Extract Text -->
+        <div class="bg-ph-dark rounded-xl p-4 sm:p-6 shadow-lg border border-ph-gray">
+            <h3 class="text-ph-orange mb-3 text-base sm:text-lg font-bold">Extract Text</h3>
+            <button id="extractText" class="w-full bg-ph-orange hover:bg-yellow-500 disabled:bg-ph-gray disabled:cursor-not-allowed text-ph-black font-bold py-3 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5" disabled>Extract Text from Image</button>
+            <div id="progressContainer" class="mt-4 hidden">
+                <div class="bg-ph-gray h-3 rounded-full overflow-hidden mb-3">
+                    <div class="bg-ph-orange h-3 w-0 transition-all duration-300" id="progressBar"></div>
+                </div>
+                <div class="text-ph-text-secondary font-semibold text-sm text-center" id="progressText" aria-live="polite">Starting OCR...</div>
+            </div>
+        </div>
+
+        <!-- Create Announcement Form -->
+        <div class="bg-ph-dark rounded-xl p-4 sm:p-6 shadow-lg border border-ph-gray">
+            <h3 class="text-ph-orange mb-4 text-base sm:text-lg font-bold">Create Announcement</h3>
+            <form id="announcementForm" class="space-y-4">
+                <div>
+                    <label for="announcementTitle" class="block mb-2 text-ph-text font-semibold text-sm">Announcement Title:</label>
+                    <input type="text" id="announcementTitle" placeholder="Enter announcement title..." required class="w-full px-4 py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text placeholder-ph-text-secondary focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all">
+                </div>
+                <div>
+                    <label for="announcementContent" class="block mb-2 text-ph-text font-semibold text-sm">Content:</label>
+                    <textarea id="announcementContent" rows="6" placeholder="Content will appear here after text extraction..." required class="w-full px-4 py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text placeholder-ph-text-secondary focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 resize-none transition-all"></textarea>
+                </div>
+                <div>
+                    <label for="announcementDate" class="block mb-2 text-ph-text font-semibold text-sm">Schedule Date:</label>
+                    <input type="date" id="announcementDate" required class="w-full px-4 py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all">
+                </div>
+                <div>
+                    <label for="targetAudience" class="block mb-2 text-ph-text font-semibold text-sm">Target Audience:</label>
+                    <select id="targetAudience" required class="w-full px-4 py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all cursor-pointer">
+                        <option value="">Select Target Audience</option>
+                        <option value="all">All</option>
+                        <option value="faculty">Faculty Only</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="category" class="block mb-2 text-ph-text font-semibold text-sm">Category:</label>
+                    <select id="category" required class="w-full px-4 py-3 bg-ph-black border border-ph-gray rounded-lg text-sm text-ph-text focus:border-ph-orange focus:outline-none focus:ring-2 focus:ring-ph-orange/30 transition-all cursor-pointer">
+                        <option value="">Select Category</option>
+                        <option value="Emergency">Emergency</option>
+                        <option value="Memo">Memo</option>
+                        <option value="Notices">Notices</option>
+                        <option value="Deadline">Deadline</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg text-base sm:text-lg">📤 Create Announcement</button>
+            </form>
+        </div>
+
+        <!-- Success Message -->
+        <div id="results" class="bg-green-600/20 border-2 border-green-600 rounded-xl p-4 sm:p-6 text-center text-green-400 hidden" aria-live="polite">
+            <h3 class="font-bold text-base sm:text-lg mb-2">✅ Announcement Created!</h3>
+            <p class="text-sm">Your announcement has been saved to the database.</p>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. SUPABASE & GLOBAL SETUP ---
+        const supabaseUrl = 'https://dqtictujkhxultwoaqaw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxdGljdHVqa2h4dWx0d29hcWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyOTU1MjksImV4cCI6MjA3Mzg3MTUyOX0.DsnJZ9ylCBlTeVp_KdgRq71cV0f7MojOfuWg1MVGS5I';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentImage = null;
+        let stream = null;
+
+        const startCameraBtn = document.getElementById('startCamera'), video = document.getElementById('video'),
+              canvas = document.getElementById('canvas'), captureBtn = document.getElementById('capturePhoto'),
+              stopCameraBtn = document.getElementById('stopCamera'), imageInput = document.getElementById('imageInput'),
+              imagePreview = document.getElementById('imagePreview'), extractTextBtn = document.getElementById('extractText'),
+              extractedTextPreview = document.getElementById('extractedTextPreview'), progressContainer = document.getElementById('progressContainer'),
+              progressBar = document.getElementById('progressBar'), progressText = document.getElementById('progressText'),
+              announcementForm = document.getElementById('announcementForm'), results = document.getElementById('results');
+        
+    // ============================================
+    // PAGE PROTECTION - REDIRECT IF NOT LOGGED IN
+    // ============================================
+    function protectPage() {
+        const loggedInUser = localStorage.getItem('loggedInUser');
+        
+        if (!loggedInUser) {
+            console.log('🔒 No session - redirecting to login');
+            window.location.href = 'faculty_login.html';
+            return false;
+        }
+        
+        console.log('✅ User authenticated');
+        return true;
+    }
+
+    // Run protection immediately
+    if (!protectPage()) {
+        throw new Error('Authentication required');
+    }
+
+        // --- 3. CORE LOGIC (Camera, Upload, OCR) ---
+        document.getElementById('announcementDate').valueAsDate = new Date();
+        
+        startCameraBtn.addEventListener('click', async () => { 
+            try { 
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
+                video.srcObject = stream; 
+                video.classList.remove('hidden'); 
+                captureBtn.classList.remove('hidden'); 
+                stopCameraBtn.classList.remove('hidden'); 
+                startCameraBtn.classList.add('hidden'); 
+            } catch (error) { 
+                alert('Camera access denied or not available'); 
+                console.error('Camera error:', error); 
+            } 
+        });
+        
+        captureBtn.addEventListener('click', () => { 
+            const context = canvas.getContext('2d'); 
+            canvas.width = video.videoWidth; 
+            canvas.height = video.videoHeight; 
+            context.drawImage(video, 0, 0); 
+            canvas.toBlob(blob => { 
+                currentImage = blob; 
+                displayImage(canvas.toDataURL()); 
+                stopCamera(); 
+                extractTextBtn.disabled = false; 
+            }); 
+        });
+        
+        stopCameraBtn.addEventListener('click', stopCamera);
+        
+        function stopCamera() { 
+            if (stream) { 
+                stream.getTracks().forEach(track => track.stop()); 
+                stream = null; 
+            } 
+            video.classList.add('hidden'); 
+            captureBtn.classList.add('hidden'); 
+            stopCameraBtn.classList.add('hidden'); 
+            startCameraBtn.classList.remove('hidden'); 
+        }
+        
+        imageInput.addEventListener('change', (e) => { 
+            const file = e.target.files[0]; 
+            if (file) { 
+                currentImage = file; 
+                const reader = new FileReader(); 
+                reader.onload = (e) => { 
+                    displayImage(e.target.result); 
+                    extractTextBtn.disabled = false; 
+                }; 
+                reader.readAsDataURL(file); 
+            } 
+        });
+        
+        function displayImage(src) { 
+            imagePreview.innerHTML = `<img src="${src}" alt="Selected image" class="w-full rounded-lg shadow-lg border-2 border-ph-gray">`; 
+        }
+        
+        extractTextBtn.addEventListener('click', async () => { 
+            if (!currentImage) { 
+                alert('Please select or capture an image first'); 
+                return; 
+            } 
+            progressContainer.classList.remove('hidden'); 
+            extractTextBtn.disabled = true; 
+            extractTextBtn.textContent = 'Processing...'; 
+            try { 
+                const result = await Tesseract.recognize(currentImage, 'eng', { 
+                    logger: m => { 
+                        if (m.status === 'recognizing text') { 
+                            const progress = Math.round(m.progress * 100); 
+                            progressBar.style.width = progress + '%'; 
+                            progressText.textContent = `Processing: ${progress}%`; 
+                        } 
+                    } 
+                }); 
+                const extractedText = result.data.text; 
+                const lines = extractedText.split('\n').filter(line => line.trim()); 
+                extractedTextPreview.textContent = extractedText.substring(0, 100) + (extractedText.length > 100 ? '...' : '') || 'No text found'; 
+                if (lines.length > 0) { 
+                    document.getElementById('announcementTitle').value = lines[0].trim(); 
+                    document.getElementById('announcementContent').value = extractedText; 
+                } 
+                progressContainer.classList.add('hidden'); 
+            } catch (error) { 
+                console.error('OCR Error:', error); 
+                alert('Error extracting text. Please try again.'); 
+                progressContainer.classList.add('hidden'); 
+            } finally { 
+                extractTextBtn.disabled = false; 
+                extractTextBtn.textContent = 'Extract Text from Image'; 
+            } 
+        });
+
+        // --- 4. FORM SUBMISSION TO SUPABASE ---
+        announcementForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const announcementData = {
+                title: document.getElementById('announcementTitle').value,
+                description: document.getElementById('announcementContent').value,
+                scheduled_date: document.getElementById('announcementDate').value,
+                target_audience: document.getElementById('targetAudience').value,
+                category: document.getElementById('category').value,
+            };
+
+            const { data, error } = await supabaseClient
+                .from('announcements')
+                .insert([announcementData]);
+
+            if (error) {
+                alert('Error creating announcement: ' + error.message);
+                console.error(error);
+            } else {
+                console.log('Announcement created:', data);
+                results.classList.remove('hidden');
+
+                setTimeout(() => {
+                    announcementForm.reset();
+                    imagePreview.innerHTML = '';
+                    extractedTextPreview.textContent = 'No text extracted yet';
+                    results.classList.add('hidden');
+                    extractTextBtn.disabled = true;
+                    currentImage = null;
+                    document.getElementById('announcementDate').valueAsDate = new Date();
+                }, 3000);
+            }
+        });
+
+        // --- 5. INITIAL PAGE LOAD ---
+        document.addEventListener('DOMContentLoaded', () => {
+            protectPage();
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                startCameraBtn.classList.add('hidden');
+                console.warn('Camera not supported on this device');
+            }
+        });
+    </script>
+</body>
+</html>
