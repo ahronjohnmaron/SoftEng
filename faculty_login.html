@@ -6,9 +6,9 @@
     <title>Department Communication Hub - Login</title>
     <link rel="icon" type="image/x-icon" href="CCSICTLOGOCROP.png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="susi.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -32,6 +32,11 @@
         .bg-image-section {
             background-image: url('BG.jpg');
             background-position: center;
+        }
+        #captchaCanvas {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1b1b1b 100%);
+            border-radius: 8px;
+            padding: 8px;
         }
     </style>
 </head>
@@ -65,7 +70,9 @@
                             class="w-full px-4 py-3 sm:py-3.5 bg-ph-black border-2 border-ph-gray rounded-lg text-white placeholder-ph-light-gray focus:outline-none focus:border-ph-orange focus:ring-4 focus:ring-ph-orange/30 transition-all duration-300 text-sm sm:text-base"
                         >
                     </div>
-                    <div>
+                    
+                    <!-- Password with Toggle -->
+                    <div class="relative">
                         <input 
                             type="password" 
                             name="password" 
@@ -73,13 +80,52 @@
                             placeholder="Password" 
                             required 
                             autocomplete="current-password"
+                            class="w-full px-4 py-3 sm:py-3.5 bg-ph-black border-2 border-ph-gray rounded-lg text-white placeholder-ph-light-gray focus:outline-none focus:border-ph-orange focus:ring-4 focus:ring-ph-orange/30 transition-all duration-300 text-sm sm:text-base pr-12"
+                        >
+                        <button 
+                            type="button" 
+                            id="togglePassword" 
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-ph-light-gray hover:text-ph-orange transition-colors duration-300 focus:outline-none"
+                            aria-label="Toggle password visibility"
+                        >
+                            <svg id="eyeIconClosed" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                            </svg>
+                            <svg id="eyeIconOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- CAPTCHA Section -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <canvas id="captchaCanvas" width="180" height="50" class="border-2 border-ph-gray rounded-lg"></canvas>
+                            <button 
+                                type="button" 
+                                id="refreshCaptcha" 
+                                class="px-4 py-3 bg-ph-gray hover:bg-ph-orange/20 text-ph-orange rounded-lg transition-all duration-300 border-2 border-ph-gray hover:border-ph-orange text-sm font-semibold"
+                                aria-label="Refresh captcha"
+                            >
+                                ↻ Refresh
+                            </button>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="captchaInput" 
+                            placeholder="Enter CAPTCHA" 
+                            required 
+                            autocomplete="off"
                             class="w-full px-4 py-3 sm:py-3.5 bg-ph-black border-2 border-ph-gray rounded-lg text-white placeholder-ph-light-gray focus:outline-none focus:border-ph-orange focus:ring-4 focus:ring-ph-orange/30 transition-all duration-300 text-sm sm:text-base"
                         >
                     </div>
+
                     <div>
                         <button 
                             type="submit" 
-                            class="w-full bg-ph-orange hover:bg-ph-orange-hover text-black font-bold py-3.5 sm:py-4 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-ph-orange/30 text-base sm:text-lg"
+                            id="loginButton"
+                            class="w-full bg-ph-orange hover:bg-ph-orange-hover text-black font-bold py-3.5 sm:py-4 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-ph-orange/30 text-base sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             Login
                         </button>
@@ -88,6 +134,9 @@
 
                 <!-- Message Area -->
                 <div id="messageArea" class="mt-4 text-center text-sm sm:text-base font-semibold text-red-500 min-h-[24px]"></div>
+                
+                <!-- Attempt Counter -->
+                <div id="attemptCounter" class="mt-2 text-center text-xs sm:text-sm text-ph-light-gray"></div>
                 
                 <!-- Back Link -->
                 <div class="mt-6">
@@ -123,23 +172,164 @@
     <script>
     const loginForm = document.getElementById('loginForm');
     const messageArea = document.getElementById('messageArea');
+    const attemptCounter = document.getElementById('attemptCounter');
+    const loginButton = document.getElementById('loginButton');
+    const captchaCanvas = document.getElementById('captchaCanvas');
+    const captchaInput = document.getElementById('captchaInput');
+    const refreshCaptcha = document.getElementById('refreshCaptcha');
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const eyeIconClosed = document.getElementById('eyeIconClosed');
+    const eyeIconOpen = document.getElementById('eyeIconOpen');
 
-    const supabaseUrl = 'https://dqtictujkhxultwoaqaw.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxdGljdHVqa2h4dWx0d29hcWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyOTU1MjksImV4cCI6MjA3Mzg3MTUyOX0.DsnJZ9ylCBlTeVp_KdgRq71cV0f7MojOfuWg1MVGS5I';
-    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    // Define redirect pages
+    const ADMIN_PAGE = 'admin_Access.html';
+    const MEMBER_PAGE = 'faculty_Dashboard.html';
+
+    let captchaCode = '';
+    let loginAttempts = 0;
+    const MAX_ATTEMPTS = 5;
+    const LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+    // Password Toggle Functionality
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type');
+        if (type === 'password') {
+            passwordInput.setAttribute('type', 'text');
+            eyeIconClosed.classList.add('hidden');
+            eyeIconOpen.classList.remove('hidden');
+        } else {
+            passwordInput.setAttribute('type', 'password');
+            eyeIconClosed.classList.remove('hidden');
+            eyeIconOpen.classList.add('hidden');
+        }
+    });
+
+    // CAPTCHA Generation Function
+    function generateCaptcha() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+        captchaCode = '';
+        for (let i = 0; i < 6; i++) {
+            captchaCode += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        
+        const ctx = captchaCanvas.getContext('2d');
+        ctx.clearRect(0, 0, captchaCanvas.width, captchaCanvas.height);
+        
+        // Background gradient
+        const gradient = ctx.createLinearGradient(0, 0, captchaCanvas.width, captchaCanvas.height);
+        gradient.addColorStop(0, '#2a2a2a');
+        gradient.addColorStop(1, '#1b1b1b');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, captchaCanvas.width, captchaCanvas.height);
+        
+        // Draw noise lines
+        for (let i = 0; i < 5; i++) {
+            ctx.strokeStyle = `rgba(255, 163, 26, ${Math.random() * 0.3})`;
+            ctx.beginPath();
+            ctx.moveTo(Math.random() * captchaCanvas.width, Math.random() * captchaCanvas.height);
+            ctx.lineTo(Math.random() * captchaCanvas.width, Math.random() * captchaCanvas.height);
+            ctx.stroke();
+        }
+        
+        // Draw captcha text
+        ctx.font = 'bold 28px Inter, Arial';
+        ctx.textBaseline = 'middle';
+        
+        for (let i = 0; i < captchaCode.length; i++) {
+            ctx.save();
+            const x = 20 + (i * 25);
+            const y = captchaCanvas.height / 2;
+            const angle = (Math.random() - 0.5) * 0.4;
+            
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.fillStyle = '#ffa31a';
+            ctx.fillText(captchaCode[i], 0, 0);
+            ctx.restore();
+        }
+        
+        captchaInput.value = '';
+    }
+
+    // Refresh CAPTCHA button
+    refreshCaptcha.addEventListener('click', generateCaptcha);
+
+    // Check lockout status
+    function checkLockout() {
+        const lockoutData = localStorage.getItem('loginLockout');
+        if (lockoutData) {
+            const { timestamp, attempts } = JSON.parse(lockoutData);
+            const currentTime = new Date().getTime();
+            
+            if (currentTime - timestamp < LOCKOUT_TIME && attempts >= MAX_ATTEMPTS) {
+                const remainingTime = Math.ceil((LOCKOUT_TIME - (currentTime - timestamp)) / 60000);
+                messageArea.textContent = `✗ Too many failed attempts. Try again in ${remainingTime} minutes`;
+                messageArea.classList.add('text-red-500');
+                loginButton.disabled = true;
+                attemptCounter.textContent = `Account temporarily locked`;
+                return true;
+            } else if (currentTime - timestamp >= LOCKOUT_TIME) {
+                localStorage.removeItem('loginLockout');
+                loginAttempts = 0;
+                loginButton.disabled = false;
+            } else {
+                loginAttempts = attempts;
+            }
+        }
+        return false;
+    }
+
+    // Update attempt counter display
+    function updateAttemptCounter() {
+        const remaining = MAX_ATTEMPTS - loginAttempts;
+        if (loginAttempts > 0) {
+            attemptCounter.textContent = `${remaining} attempt${remaining !== 1 ? 's' : ''} remaining`;
+            attemptCounter.classList.add('text-yellow-500');
+        }
+    }
 
     // Check if already logged in
-    const loggedInUser = localStorage.getItem('loggedInUser');
-    if (loggedInUser) {
-        window.location.href = 'faculty_Dashboard.html';
+    function checkExistingSession() {
+        const loggedInUser = localStorage.getItem('loggedInUser');
+        if (loggedInUser) {
+            const userData = JSON.parse(loggedInUser);
+            // Redirect based on stored user type
+            if (userData.userType === 'admin') {
+                window.location.href = ADMIN_PAGE;
+            } else {
+                window.location.href = MEMBER_PAGE;
+            }
+        }
     }
+
+    // Initialize
+    checkExistingSession();
+    checkLockout();
+    generateCaptcha();
+    updateAttemptCounter();
 
     loginForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         messageArea.textContent = '';
 
-        const email = document.getElementById('email').value;
+        // Check lockout first
+        if (checkLockout()) {
+            return;
+        }
+
+        const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
+        const userCaptcha = captchaInput.value;
+
+        // Validate CAPTCHA
+        if (userCaptcha !== captchaCode) {
+            messageArea.textContent = '✗ Invalid CAPTCHA. Please try again';
+            messageArea.classList.remove('text-ph-orange');
+            messageArea.classList.add('text-red-500');
+            generateCaptcha();
+            return;
+        }
         
         const submitButton = loginForm.querySelector('button[type="submit"]');
         submitButton.disabled = true;
@@ -147,53 +337,116 @@
         submitButton.classList.add('opacity-70', 'cursor-not-allowed');
 
         try {
-            // Query the 'members' table for an exact match
-            const { data, error } = await supabaseClient
+            // First, check if user exists in admin_User table
+            const { data: adminData, error: adminError } = await supabaseClient
+                .from('admin_user')
+                .select('*')
+                .eq('email', email)
+                .eq('password', password)
+                .maybeSingle();
+
+            // If admin user found, redirect to admin page
+            if (adminData) {
+                // Login successful - reset attempts
+                localStorage.removeItem('loginLockout');
+                loginAttempts = 0;
+                
+                messageArea.textContent = '✓ Admin Login Successful!';
+                messageArea.classList.remove('text-red-500');
+                messageArea.classList.add('text-ph-orange');
+                
+                // Store admin session (excluding password)
+                const adminInfo = {
+                    id: adminData.id,
+                    email: adminData.email,
+                    userType: 'admin',
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('loggedInUser', JSON.stringify(adminInfo));
+                
+                console.log('✅ Admin login successful:', adminData.email);
+                
+                setTimeout(() => {
+                    window.location.href = ADMIN_PAGE;
+                }, 1000);
+                return;
+            }
+
+            // If not admin, check members table
+            const { data: memberData, error: memberError } = await supabaseClient
                 .from('members')
                 .select('*')
                 .eq('email', email)
                 .eq('password', password)
-                .single();
+                .maybeSingle();
 
-            if (error || !data) {
-                messageArea.textContent = '✗ Invalid email or password';
-                messageArea.classList.remove('text-ph-orange');
-                messageArea.classList.add('text-red-500');
-                console.error('Login failed:', error);
+            // If member found with matching credentials
+            if (memberData) {
+                // Login successful - reset attempts
+                localStorage.removeItem('loginLockout');
+                loginAttempts = 0;
+                
+                messageArea.textContent = '✓ Login Successful!';
+                messageArea.classList.remove('text-red-500');
+                messageArea.classList.add('text-ph-orange');
+                
+                // Store member session (excluding password)
+                const memberInfo = {
+                    id: memberData.id,
+                    email: memberData.email,
+                    full_name: memberData.full_name,
+                    user_type: memberData.user_type,
+                    userType: 'member',
+                    created_at: memberData.created_at,
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('loggedInUser', JSON.stringify(memberInfo));
+                
+                console.log('✅ Member login successful:', memberData.email);
+                
+                setTimeout(() => {
+                    window.location.href = MEMBER_PAGE;
+                }, 1000);
                 return;
             }
 
-            // Login successful
-            messageArea.textContent = '✓ Login Successful!';
-            messageArea.classList.remove('text-red-500');
-            messageArea.classList.add('text-ph-orange');
+            // If no match found in either table
+            loginAttempts++;
             
-            // Save user session to localStorage
-            localStorage.setItem('loggedInUser', JSON.stringify({
-                email: data.email,
-                name: data.name || data.email,
-                role: data.role || 'faculty',
-                loginTime: new Date().toISOString()
+            // Store attempt data
+            localStorage.setItem('loginLockout', JSON.stringify({
+                timestamp: new Date().getTime(),
+                attempts: loginAttempts
             }));
+
+            if (loginAttempts >= MAX_ATTEMPTS) {
+                messageArea.textContent = '✗ Maximum attempts exceeded. Account locked for 15 minutes';
+                messageArea.classList.add('text-red-500');
+                loginButton.disabled = true;
+                attemptCounter.textContent = 'Account temporarily locked';
+                attemptCounter.classList.add('text-red-500');
+            } else {
+                const remaining = MAX_ATTEMPTS - loginAttempts;
+                messageArea.textContent = '✗ Invalid email or password';
+                messageArea.classList.add('text-red-500');
+                updateAttemptCounter();
+            }
             
-            console.log('✅ Login successful:', data.email);
-            
-            setTimeout(() => {
-                window.location.href = 'faculty_Dashboard.html';
-            }, 1000);
+            generateCaptcha();
 
         } catch (err) {
             messageArea.textContent = `✗ An error occurred: ${err.message}`;
             messageArea.classList.remove('text-ph-orange');
             messageArea.classList.add('text-red-500');
             console.error('Error:', err);
+            generateCaptcha();
         } finally {
             submitButton.disabled = false;
             submitButton.textContent = 'Login';
             submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
         }
     });
-</script>
+    </script>
 
 </body>
 </html>
