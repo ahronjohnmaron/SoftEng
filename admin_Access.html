@@ -37,34 +37,84 @@
             font-family: 'Poppins', sans-serif;
             background-color: #000000;
             color: #FFFFFF;
+            overflow-x: hidden;
         }
         
         .sidebar {
             transition: all 0.3s ease;
             background-color: #1C1C1C;
             border-right: 1px solid #2C2C2C;
+            height: 100vh;
+            overflow-y: auto;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 40;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #1C1C1C;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #FFA500;
+            border-radius: 3px;
         }
         
         .content-area {
             transition: all 0.3s ease;
             background-color: #000000;
+            margin-left: 256px;
+            min-height: 100vh;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 1023px) {
             .sidebar {
                 transform: translateX(-100%);
-                position: fixed;
-                z-index: 50;
+                width: 280px;
             }
             
             .sidebar.active {
                 transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(255, 165, 0, 0.3);
+            }
+
+            .content-area {
+                margin-left: 0;
+            }
+
+            .mobile-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background-color: rgba(0, 0, 0, 0.7);
+                z-index: 39;
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .sidebar {
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr !important;
             }
         }
         
         .table-container {
             overflow-x: auto;
             border-radius: 8px;
+            -webkit-overflow-scrolling: touch;
         }
         
         .table-container::-webkit-scrollbar {
@@ -81,7 +131,8 @@
         }
         
         table {
-            min-width: 100%;
+            min-width: 800px;
+            width: 100%;
         }
         
         table tbody tr {
@@ -95,11 +146,19 @@
         
         table thead {
             background-color: #2C2C2C;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         
         table thead th {
             color: #FFA500;
             font-weight: 700;
+            white-space: nowrap;
+        }
+
+        table td {
+            white-space: nowrap;
         }
         
         .modal {
@@ -112,6 +171,8 @@
             height: 100%;
             background-color: rgba(0,0,0,0.8);
             animation: fadeIn 0.3s;
+            padding: 1rem;
+            overflow-y: auto;
         }
         
         .modal.active {
@@ -129,6 +190,19 @@
             animation: slideIn 0.3s;
             background-color: #1C1C1C;
             border: 2px solid #FFA500;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        @media (max-width: 640px) {
+            .modal-content {
+                padding: 1.5rem !important;
+                margin: 1rem;
+            }
+
+            .modal h3 {
+                font-size: 1.25rem !important;
+            }
         }
         
         @keyframes slideIn {
@@ -146,15 +220,37 @@
         .stats-card:hover {
             transform: translateY(-5px);
         }
+
+        @media (max-width: 640px) {
+            .stats-card {
+                padding: 0.75rem !important;
+            }
+
+            .stats-card .text-2xl {
+                font-size: 1.5rem;
+            }
+
+            .stats-card .text-xs {
+                font-size: 0.65rem;
+            }
+        }
         
         .btn-action {
             transition: all 0.2s;
+            padding: 0.5rem;
+            font-size: 1rem;
         }
         
         .btn-action:hover {
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
 
+        @media (max-width: 640px) {
+            .btn-action {
+                padding: 0.4rem;
+                font-size: 0.9rem;
+            }
+        }
 
         .loading {
             display: inline-block;
@@ -166,11 +262,9 @@
             animation: spin 1s ease-in-out infinite;
         }
 
-
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
 
         .password-toggle {
             cursor: pointer;
@@ -178,23 +272,19 @@
             color: #B3B3B3;
         }
 
-
         .password-toggle:hover {
             color: #FFA500;
         }
 
-
         .password-cell {
             position: relative;
         }
-
 
         .password-display {
             display: inline-flex;
             align-items: center;
             gap: 8px;
         }
-
 
         /* Form inputs theming */
         input:not([type="checkbox"]):not([type="radio"]), 
@@ -205,92 +295,75 @@
             color: #FFFFFF !important;
         }
 
-
         input:focus, select:focus, textarea:focus {
             border-color: #FFA500 !important;
             outline: none;
             box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.3) !important;
         }
 
-
         input::placeholder, textarea::placeholder {
             color: #B3B3B3 !important;
         }
-
 
         /* Button theming */
         .bg-indigo-500 {
             background-color: #FFA500 !important;
         }
 
-
         .bg-indigo-500:hover {
             background-color: #ff9500 !important;
         }
-
 
         .bg-indigo-600 {
             background-color: #FFA500 !important;
         }
 
-
         .bg-indigo-600:hover {
             background-color: #ff9500 !important;
         }
-
 
         .text-indigo-600 {
             color: #FFA500 !important;
         }
 
-
         .border-indigo-500 {
             border-color: #FFA500 !important;
         }
 
-
         .ring-indigo-500 {
             --tw-ring-color: rgba(255, 165, 0, 0.5) !important;
         }
-
 
         /* Background theming */
         .bg-white {
             background-color: #1C1C1C !important;
         }
 
-
         .bg-gray-50 {
             background-color: #000000 !important;
         }
-
 
         .bg-gray-100 {
             background-color: #000000 !important;
         }
 
-
         .bg-gray-200 {
             background-color: #2C2C2C !important;
         }
-
 
         /* Text theming */
         .text-gray-700, .text-gray-800, .text-gray-900 {
             color: #FFFFFF !important;
         }
 
-
         .text-gray-500, .text-gray-600 {
             color: #B3B3B3 !important;
         }
-
 
         /* Border theming */
         .border-gray-200, .border-gray-300 {
             border-color: #2C2C2C !important;
         }
-
 
         /* Logo hub styling */
         .logo-hub {
@@ -301,117 +374,184 @@
             margin-left: 4px;
             font-weight: 800;
         }
+
+        /* Responsive header */
+        @media (max-width: 640px) {
+            .page-header h1 {
+                font-size: 1.5rem !important;
+            }
+
+            .page-header p {
+                font-size: 0.875rem;
+            }
+
+            .table-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch !important;
+            }
+
+            .table-header h2 {
+                font-size: 1.25rem !important;
+            }
+
+            .table-header button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Action buttons responsive */
+        @media (max-width: 640px) {
+            .action-buttons {
+                gap: 0.5rem !important;
+            }
+
+            .action-buttons a,
+            .action-buttons button {
+                font-size: 0.875rem;
+                padding: 0.625rem 0.75rem !important;
+            }
+
+            .action-buttons span {
+                display: none;
+            }
+
+            .action-buttons i {
+                margin: 0 !important;
+            }
+        }
+
+        /* Navigation responsive */
+        @media (max-width: 640px) {
+            .nav-link {
+                padding: 0.75rem !important;
+                font-size: 0.875rem;
+            }
+
+            .nav-link i {
+                width: 1.25rem !important;
+            }
+        }
+
+        /* Mobile padding adjustments */
+        @media (max-width: 640px) {
+            .content-area {
+                padding: 1rem !important;
+            }
+
+            #tableSection {
+                padding: 1rem !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100">
 
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" class="mobile-overlay"></div>
 
     <!-- Mobile Menu Button -->
     <button id="menuToggle" class="lg:hidden fixed top-4 left-4 z-50 bg-indigo-600 text-white p-3 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors">
         <i class="fas fa-bars text-xl"></i>
     </button>
 
-
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <aside id="sidebar" class="sidebar w-64 bg-white shadow-lg">
-            <div class="p-6 border-b border-gray-200">
-                <h2 class="text-2xl font-bold text-gray-800">Admin <span class="logo-hub">Hub</span></h2>
-                <p class="text-sm text-gray-500 mt-1">Database Manager</p>
+            <div class="p-4 sm:p-6 border-b border-gray-200">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Admin <span class="logo-hub">Hub</span></h2>
+                <p class="text-xs sm:text-sm text-gray-500 mt-1">Database Manager</p>
             </div>
             
             <!-- Dashboard Stats -->
-            <div class="p-4 space-y-3">
-                <div class="stats-card p-4 rounded-lg shadow">
-                    <div class="text-2xl font-bold" id="notificationCount">0</div>
+            <div class="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                <div class="stats-card p-3 sm:p-4 rounded-lg shadow">
+                    <div class="text-xl sm:text-2xl font-bold" id="notificationCount">0</div>
                     <div class="text-xs font-semibold uppercase tracking-wide">Notifications</div>
                 </div>
-                <div class="stats-card p-4 rounded-lg shadow">
-                    <div class="text-2xl font-bold" id="memberCount">0</div>
+                <div class="stats-card p-3 sm:p-4 rounded-lg shadow">
+                    <div class="text-xl sm:text-2xl font-bold" id="memberCount">0</div>
                     <div class="text-xs font-semibold uppercase tracking-wide">Total Members</div>
                 </div>
-                <div class="stats-card p-4 rounded-lg shadow">
-                    <div class="text-2xl font-bold" id="announcementCount">0</div>
+                <div class="stats-card p-3 sm:p-4 rounded-lg shadow">
+                    <div class="text-xl sm:text-2xl font-bold" id="announcementCount">0</div>
                     <div class="text-xs font-semibold uppercase tracking-wide">Announcements</div>
                 </div>
-                <div class="stats-card p-4 rounded-lg shadow">
-                    <div class="text-2xl font-bold" id="adminUserCount">0</div>
+                <div class="stats-card p-3 sm:p-4 rounded-lg shadow">
+                    <div class="text-xl sm:text-2xl font-bold" id="adminUserCount">0</div>
                     <div class="text-xs font-semibold uppercase tracking-wide">Admin Users</div>
                 </div>
-                <div class="stats-card p-4 rounded-lg shadow">
-                    <div class="text-2xl font-bold" id="adminCount">0</div>
+                <div class="stats-card p-3 sm:p-4 rounded-lg shadow">
+                    <div class="text-xl sm:text-2xl font-bold" id="adminCount">0</div>
                     <div class="text-xs font-semibold uppercase tracking-wide">Total Admins</div>
                 </div>
             </div>
             
             <!-- Navigation -->
-            <nav class="mt-6 px-4 space-y-2">
-                <button onclick="showSection('notifications')" data-table="notifications" class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+            <nav class="mt-4 sm:mt-6 px-3 sm:px-4 space-y-2">
+                <button onclick="showSection('notifications')" data-table="notifications" class="nav-link w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
                     <i class="fas fa-bell w-5"></i>
-                    <span class="font-semibold">Notifications</span>
+                    <span class="font-semibold text-sm sm:text-base">Notifications</span>
                 </button>
-                <button onclick="showSection('members')" data-table="members" class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                <button onclick="showSection('members')" data-table="members" class="nav-link w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
                     <i class="fas fa-users w-5"></i>
-                    <span class="font-semibold">Members</span>
+                    <span class="font-semibold text-sm sm:text-base">Members</span>
                 </button>
-                <button onclick="showSection('announcements')" data-table="announcements" class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                <button onclick="showSection('announcements')" data-table="announcements" class="nav-link w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
                     <i class="fas fa-bullhorn w-5"></i>
-                    <span class="font-semibold">Announcements</span>
+                    <span class="font-semibold text-sm sm:text-base">Announcements</span>
                 </button>
-                <button onclick="showSection('admin_user')" data-table="admin_user" class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                <button onclick="showSection('admin_user')" data-table="admin_user" class="nav-link w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
                     <i class="fas fa-user-cog w-5"></i>
-                    <span class="font-semibold">Admin Account</span>
+                    <span class="font-semibold text-sm sm:text-base">Admin Account</span>
                 </button>
-                <button onclick="showSection('admins')" data-table="admins" class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                <button onclick="showSection('admins')" data-table="admins" class="nav-link w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
                     <i class="fas fa-user-shield w-5"></i>
-                    <span class="font-semibold">Admins Password</span>
+                    <span class="font-semibold text-sm sm:text-base">Admins Password</span>
                 </button>
             </nav>
             
             <!-- Action Buttons -->
-            <div class="mt-6 px-4 space-y-2">
-                <a href="faculty_Dashboard.html" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
+            <div class="mt-4 sm:mt-6 px-3 sm:px-4 space-y-2 pb-4 action-buttons">
+                <a href="faculty_Dashboard.html" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Go to Dashboard</span>
                 </a>
-                <button onclick="logout()" class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
+                <button onclick="logout()" class="w-full bg-red-500 hover:bg-red-600 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </button>
             </div>
         </aside>
 
-
         <!-- Main Content -->
         <main class="flex-1 content-area p-4 sm:p-6 lg:p-8 overflow-auto">
             <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-800 mb-2">Database Manager</h1>
-                <p class="text-gray-600">Manage mo na yan insan</p>
+            <div class="mb-6 sm:mb-8 page-header pt-12 lg:pt-0">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Database Manager</h1>
+                <p class="text-sm sm:text-base text-gray-600">Manage mo na yan insan</p>
             </div>
 
-
             <!-- Table Container -->
-            <div id="tableSection" class="bg-white rounded-xl shadow-lg p-6">
+            <div id="tableSection" class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
                 <!-- Dynamic content will be loaded here -->
             </div>
         </main>
     </div>
 
-
     <!-- Modal -->
     <div id="modal" class="modal">
-        <div class="modal-content rounded-xl p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 id="modalTitle" class="text-2xl font-bold text-gray-800"></h3>
+        <div class="modal-content rounded-xl p-6 sm:p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 sm:mb-6">
+                <h3 id="modalTitle" class="text-xl sm:text-2xl font-bold text-gray-800"></h3>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
             </div>
-            <form id="modalForm" class="space-y-4">
+            <form id="modalForm" class="space-y-3 sm:space-y-4">
                 <!-- Dynamic form fields will be inserted here -->
             </form>
         </div>
     </div>
-
 
     <script>
         // Supabase Configuration
@@ -419,105 +559,102 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxdGljdHVqa2h4dWx0d29hcWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyOTU1MjksImV4cCI6MjA3Mzg3MTUyOX0.DsnJZ9ylCBlTeVp_KdgRq71cV0f7MojOfuWg1MVGS5I';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-
-
-    // ============================================
-    // PAGE PROTECTION
-    // ============================================
-    function protectPage() {
-        const loggedInUser = localStorage.getItem('loggedInUser');
-        
-        if (!loggedInUser) {
-            console.log('🔒 No session - redirecting to login');
-            window.location.href = 'faculty_login.html';
-            return false;
+        // ============================================
+        // PAGE PROTECTION
+        // ============================================
+        function protectPage() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            
+            if (!loggedInUser) {
+                console.log('🔒 No session - redirecting to login');
+                window.location.href = 'faculty_login.html';
+                return false;
+            }
+            
+            try {
+                const userData = JSON.parse(loggedInUser);
+                console.log('✅ User authenticated:', userData.email);
+                return true;
+            } catch (error) {
+                console.error('❌ Invalid session data');
+                localStorage.removeItem('loggedInUser');
+                window.location.href = 'faculty_login.html';
+                return false;
+            }
         }
-        
-        try {
-            const userData = JSON.parse(loggedInUser);
-            console.log('✅ User authenticated:', userData.email);
-            return true;
-        } catch (error) {
-            console.error('❌ Invalid session data');
+
+        // ====================================================
+        // AUTO LOGOUT AFTER 5 MINUTES OF INACTIVITY
+        // ====================================================
+        const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
+        let inactivityTimer;
+
+        function logoutUser() {
+            alert("You have been logged out due to inactivity.");
             localStorage.removeItem('loggedInUser');
+            localStorage.removeItem('lastActivity');
             window.location.href = 'faculty_login.html';
-            return false;
         }
-    }
 
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            localStorage.setItem('lastActivity', Date.now());
+            inactivityTimer = setTimeout(logoutUser, INACTIVITY_LIMIT);
+        }
 
+        // Check time difference when page loads
+        window.onload = () => {
+            const lastActivity = localStorage.getItem('lastActivity');
+            if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
+                logoutUser();
+            } else {
+                resetInactivityTimer();
+            }
+        };
 
-     // ====================================================
-    // AUTO LOGOUT AFTER 5 MINUTES OF INACTIVITY
-    // ====================================================
-    const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
-let inactivityTimer;
+        // Detect activity
+        document.onmousemove = resetInactivityTimer;
+        document.onkeypress = resetInactivityTimer;
+        document.onclick = resetInactivityTimer;
+        document.onscroll = resetInactivityTimer;
+        document.ontouchstart = resetInactivityTimer;
 
-
-function logoutUser() {
-  alert("You have been logged out due to inactivity.");
-  localStorage.removeItem('loggedInUser');
-  localStorage.removeItem('lastActivity'); // clear the timestamp
-  window.location.href = 'faculty_login.html';
-}
-
-
-function resetInactivityTimer() {
-  clearTimeout(inactivityTimer);
-  localStorage.setItem('lastActivity', Date.now());
-  inactivityTimer = setTimeout(logoutUser, INACTIVITY_LIMIT);
-}
-
-
-// Check time difference when page loads
-window.onload = () => {
-  const lastActivity = localStorage.getItem('lastActivity');
-  if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
-    logoutUser(); // auto logout if 5 mins already passed while away
-  } else {
-    resetInactivityTimer();
-  }
-};
-
-
-// Detect activity
-document.onmousemove = resetInactivityTimer;
-document.onkeypress = resetInactivityTimer;
-document.onclick = resetInactivityTimer;
-document.onscroll = resetInactivityTimer;
-document.ontouchstart = resetInactivityTimer;
-
-
-    // ============================================
-    // RUN PROTECTION IMMEDIATELY
-    // ============================================
-    if (!protectPage()) {
-        throw new Error('Authentication required');
-    }
-
-
-
-
+        // ============================================
+        // RUN PROTECTION IMMEDIATELY
+        // ============================================
+        if (!protectPage()) {
+            throw new Error('Authentication required');
+        }
 
         let currentTable = 'notifications';
         let currentEditId = null;
 
-
         // Mobile menu toggle
-        document.getElementById('menuToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('active');
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
         });
 
-
-        // Close sidebar on outside click (mobile)
-        document.addEventListener('click', (e) => {
-            const sidebar = document.getElementById('sidebar');
-            const menuBtn = document.getElementById('menuToggle');
-            if (window.innerWidth < 1024 && !sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
-                sidebar.classList.remove('active');
-            }
+        // Close sidebar when clicking overlay
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
         });
 
+        // Close sidebar on nav click (mobile)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            });
+        });
 
         // Show section
         async function showSection(table) {
@@ -538,10 +675,10 @@ document.ontouchstart = resetInactivityTimer;
             
             // Close mobile menu
             if (window.innerWidth < 1024) {
-                document.getElementById('sidebar').classList.remove('active');
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
             }
         }
-
 
         // Load dashboard stats
         async function loadDashboard() {
@@ -554,7 +691,6 @@ document.ontouchstart = resetInactivityTimer;
                     supabaseClient.from('admins').select('*')
                 ]);
 
-
                 document.getElementById('notificationCount').textContent = notifications.data?.length || 0;
                 document.getElementById('memberCount').textContent = members.data?.length || 0;
                 document.getElementById('announcementCount').textContent = announcements.data?.length || 0;
@@ -565,49 +701,46 @@ document.ontouchstart = resetInactivityTimer;
             }
         }
 
-
         // Load table data
         async function loadTableData(table) {
-    const container = document.getElementById('tableSection');
-    
-    container.innerHTML = `
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 capitalize">${table.replace('_', ' ')} Management</h2>
-            <button onclick="openAddModal('${table}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2">
-                <i class="fas fa-plus"></i>
-                <span>Add ${table.replace('_', ' ').slice(0, -1)}</span>
-            </button>
-        </div>
-        <div class="table-container">
-            <table class="w-full">
-                <thead>
-                    <tr id="tableHead"></tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr><td colspan="10" class="text-center py-8 text-gray-500"><div class="loading mx-auto mb-2"></div><p>Loading...</p></td></tr>
-                </tbody>
-            </table>
-        </div>
-    `;
+            const container = document.getElementById('tableSection');
+            
+            container.innerHTML = `
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0 table-header">
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 capitalize">${table.replace('_', ' ')} Management</h2>
+                    <button onclick="openAddModal('${table}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center">
+                        <i class="fas fa-plus"></i>
+                        <span>Add ${table.replace('_', ' ').slice(0, -1)}</span>
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="w-full">
+                        <thead>
+                            <tr id="tableHead"></tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="10" class="text-center py-8 text-gray-500"><div class="loading mx-auto mb-2"></div><p>Loading...</p></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
 
-
-    try {
-        // UPDATED: Only order by created_at if the table has that column
-        let query = supabaseClient.from(table).select('*');
-        
-        // Skip ordering for admins table since it doesn't have created_at
-        if (table !== 'admins') {
-            query = query.order('created_at', { ascending: false });
+            try {
+                let query = supabaseClient.from(table).select('*');
+                
+                if (table !== 'admins') {
+                    query = query.order('created_at', { ascending: false });
+                }
+                
+                const { data, error } = await query;
+                if (error) throw error;
+                renderTable(table, data || []);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="10" class="text-center py-8 text-red-500">Error: ${error.message}</td></tr>`;
+            }
         }
-        
-        const { data, error } = await query;
-        if (error) throw error;
-        renderTable(table, data || []);
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('tableBody').innerHTML = `<tr><td colspan="10" class="text-center py-8 text-red-500">Error: ${error.message}</td></tr>`;
-    }
-}
+
         // Toggle password visibility in table
         function toggleTablePassword(btn, password) {
             const span = btn.previousElementSibling;
@@ -624,7 +757,6 @@ document.ontouchstart = resetInactivityTimer;
             }
         }
 
-
         // Toggle password visibility in form
         function togglePassword(id, btn) {
             const input = document.getElementById(id);
@@ -640,7 +772,6 @@ document.ontouchstart = resetInactivityTimer;
             }
         }
 
-
         // Format date for display
         function formatDateTime(dateString) {
             if (!dateString) return 'N/A';
@@ -654,34 +785,28 @@ document.ontouchstart = resetInactivityTimer;
             });
         }
 
-
         // Render table
         function renderTable(table, data) {
             const fields = getTableFields(table);
             const thead = document.getElementById('tableHead');
             const tbody = document.getElementById('tableBody');
 
-
-            thead.innerHTML = fields.map(f => `<th class="px-4 py-3 text-left text-sm font-bold uppercase">${f.label}</th>`).join('') + 
-                '<th class="px-4 py-3 text-left text-sm font-bold uppercase">Actions</th>';
-
+            thead.innerHTML = fields.map(f => `<th class="px-3 sm:px-4 py-3 text-left text-xs sm:text-sm font-bold uppercase">${f.label}</th>`).join('') + 
+                '<th class="px-3 sm:px-4 py-3 text-left text-xs sm:text-sm font-bold uppercase">Actions</th>';
 
             if (!data.length) {
                 tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-gray-500">No records found</td></tr>';
                 return;
             }
 
-
             tbody.innerHTML = data.map(row => `
                 <tr>
                     ${fields.map(f => {
                         let val = row[f.name] || 'N/A';
                         
-                        // Format created_at timestamp
                         if (f.name === 'created_at') {
                             val = formatDateTime(row[f.name]);
                         }
-                        // Password field with show/hide toggle
                         else if (f.name === 'password') {
                             val = `<div class="password-display">
                                 <span>••••••••</span>
@@ -690,21 +815,21 @@ document.ontouchstart = resetInactivityTimer;
                                 </button>
                             </div>`;
                         } 
-                        // Select field with badge
                         else if (f.type === 'select') {
-                            val = `<span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-semibold">${val}</span>`;
+                            val = `<span class="px-2 sm:px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-semibold">${val}</span>`;
                         }
                         
-                        return `<td class="px-4 py-3 text-sm text-gray-700">${val}</td>`;
+                        return `<td class="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-700">${val}</td>`;
                     }).join('')}
-                    <td class="px-4 py-3">
-                        <button onclick="editRecord('${table}', ${row.id})" class="text-blue-500 hover:text-blue-700 mr-3 btn-action"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteRecord('${table}', ${row.id})" class="text-red-500 hover:text-red-700 btn-action"><i class="fas fa-trash"></i></button>
+                    <td class="px-3 sm:px-4 py-3">
+                        <div class="flex gap-2">
+                            <button onclick="editRecord('${table}', ${row.id})" class="text-blue-500 hover:text-blue-700 btn-action"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteRecord('${table}', ${row.id})" class="text-red-500 hover:text-red-700 btn-action"><i class="fas fa-trash"></i></button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
         }
-
 
         // Open add modal
         function openAddModal(table) {
@@ -714,9 +839,9 @@ document.ontouchstart = resetInactivityTimer;
             const fields = getTableFields(table);
             
             form.innerHTML = fields.map(f => createFormField(f)).join('') + `
-                <div class="flex gap-3 pt-4">
-                    <button type="button" onclick="closeModal()" class="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold">Cancel</button>
-                    <button type="submit" class="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold">Add</button>
+                <div class="flex flex-col sm:flex-row gap-3 pt-4">
+                    <button type="button" onclick="closeModal()" class="flex-1 px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold text-sm sm:text-base">Cancel</button>
+                    <button type="submit" class="flex-1 px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm sm:text-base">Add</button>
                 </div>
             `;
             
@@ -740,7 +865,6 @@ document.ontouchstart = resetInactivityTimer;
             document.getElementById('modal').classList.add('active');
         }
 
-
         // Edit record
         async function editRecord(table, id) {
             try {
@@ -753,9 +877,9 @@ document.ontouchstart = resetInactivityTimer;
                 const fields = getTableFields(table);
                 
                 form.innerHTML = fields.map(f => createFormField(f, data[f.name])).join('') + `
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" onclick="closeModal()" class="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold">Cancel</button>
-                        <button type="submit" class="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold">Update</button>
+                    <div class="flex flex-col sm:flex-row gap-3 pt-4">
+                        <button type="button" onclick="closeModal()" class="flex-1 px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold text-sm sm:text-base">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm sm:text-base">Update</button>
                     </div>
                 `;
                 
@@ -782,7 +906,6 @@ document.ontouchstart = resetInactivityTimer;
             }
         }
 
-
         // Delete record
         async function deleteRecord(table, id) {
             if (!confirm('⚠️ Delete this record?')) return;
@@ -798,8 +921,7 @@ document.ontouchstart = resetInactivityTimer;
             }
         }
 
-
-        // Get table fields configuration - NOW ALL FIELDS ARE EDITABLE
+        // Get table fields configuration
         function getTableFields(table) {
             const config = {
                 notifications: [
@@ -839,11 +961,10 @@ document.ontouchstart = resetInactivityTimer;
             return config[table] || [];
         }
 
-
         // Create form field
         function createFormField(field, value = '') {
-            if (field.readonly && !currentEditId) return ''; // Skip readonly fields only when adding
-            if (field.readonly && currentEditId) return ''; // Also skip readonly fields when editing
+            if (field.readonly && !currentEditId) return '';
+            if (field.readonly && currentEditId) return '';
             
             const isEdit = currentEditId !== null;
             const isPassword = field.type === 'password';
@@ -852,26 +973,24 @@ document.ontouchstart = resetInactivityTimer;
             
             let input = '';
             if (field.type === 'select') {
-                input = `<select name="${field.name}" ${required} class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">${field.options.map(o => `<option value="${o}" ${value === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
+                input = `<select name="${field.name}" ${required} class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">${field.options.map(o => `<option value="${o}" ${value === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
             } else if (field.type === 'textarea') {
-                input = `<textarea name="${field.name}" ${required} rows="3" placeholder="${placeholder}" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">${value}</textarea>`;
+                input = `<textarea name="${field.name}" ${required} rows="3" placeholder="${placeholder}" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">${value}</textarea>`;
             } else if (field.type === 'password') {
                 const id = `pwd_${field.name}_${Date.now()}`;
-                input = `<div class="relative"><input type="password" id="${id}" name="${field.name}" ${required} placeholder="${placeholder}" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 pr-12"><button type="button" onclick="togglePassword('${id}', this)" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2"><i class="fas fa-eye"></i></button></div>`;
+                input = `<div class="relative"><input type="password" id="${id}" name="${field.name}" ${required} placeholder="${placeholder}" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 pr-12"><button type="button" onclick="togglePassword('${id}', this)" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2"><i class="fas fa-eye"></i></button></div>`;
             } else {
-                input = `<input type="${field.type}" name="${field.name}" value="${value}" ${required} placeholder="${placeholder}" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">`;
+                input = `<input type="${field.type}" name="${field.name}" value="${value}" ${required} placeholder="${placeholder}" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">`;
             }
             
             return `<div><label class="block text-sm font-semibold text-gray-700 mb-2">${field.label}${field.required && !(isEdit && isPassword) ? ' *' : ''}</label>${input}</div>`;
         }
-
 
         // Close modal
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
             currentEditId = null;
         }
-
 
         // Logout
         function logout() {
@@ -881,14 +1000,12 @@ document.ontouchstart = resetInactivityTimer;
             }
         }
 
-
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
             await loadDashboard();
             await showSection('notifications');
             document.querySelector('[data-table="notifications"]').classList.add('bg-indigo-50', 'text-indigo-600');
         });
-
 
         // ESC to close modal
         document.addEventListener('keydown', (e) => {
