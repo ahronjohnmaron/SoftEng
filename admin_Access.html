@@ -6,7 +6,6 @@
     <link rel="icon" type="image/x-icon" href="CCSICTLOGOCROP.png">
     <title>Admin Dashboard - Database Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="susi.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -416,9 +415,9 @@
 
     <script>
         // Supabase Configuration
-        const supabaseUrl = 'https://dqtictujkhxultwoaqaw.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxdGljdHVqa2h4dWx0d29hcWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyOTU1MjksImV4cCI6MjA3Mzg3MTUyOX0.DsnJZ9ylCBlTeVp_KdgRq71cV0f7MojOfuWg1MVGS5I';
-        const supabaseClient = supabase.createClient(supabaseUrl, SUPABASE_KEY);
+        const SUPABASE_URL = 'https://dqtictujkhxultwoaqaw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxdGljdHVqa2h4dWx0d29hcWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyOTU1MjksImV4cCI6MjA3Mzg3MTUyOX0.DsnJZ9ylCBlTeVp_KdgRq71cV0f7MojOfuWg1MVGS5I';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
 
@@ -898,4 +897,3 @@ document.ontouchstart = resetInactivityTimer;
     </script>
 </body>
 </html>
-
