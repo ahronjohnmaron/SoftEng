@@ -582,7 +582,7 @@
         // ====================================================
         // AUTO LOGOUT AFTER 5 MINUTES OF INACTIVITY
         // ====================================================
-        const INACTIVITY_LIMIT = 5000; // 5 minutes
+        const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
         let inactivityTimer;
 
         function logoutUser() {
@@ -1010,5 +1010,6 @@
     </script>
 </body>
 </html>
+
 
 
