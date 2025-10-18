@@ -6,29 +6,26 @@
     <link rel="icon" type="image/x-icon" href="CCSICTLOGOCROP.png">
     <title>DCH Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="susi.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         /* --- 1. COLOR PALETTE & GLOBAL STYLES --- */
         :root {
-            --primary-bg: #000000; /* Black background */
-            --secondary-bg: #1C1C1C; /* Dark gray for cards and elements */
-            --accent-orange: #FFA500; /* Main orange accent */
-            --text-primary: #FFFFFF; /* White text */
-            --text-secondary: #B3B3B3; /* Light gray for secondary text */
-            --search-bg: #2C2C2C; /* Search bar background */
-            --search-text: #FFFFFF; /* Search bar text */
+            --primary-bg: #000000;
+            --secondary-bg: #1C1C1C;
+            --accent-orange: #FFA500;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B3B3B3;
+            --search-bg: #2C2C2C;
+            --search-text: #FFFFFF;
             
-            /* Banner colors updated to fit the theme */
             --banner-all-announcement: #2C2C2C;
-            --banner-emergency: #D32F2F; /* Retained a strong red for emergencies */
-            --banner-deadline: var(--accent-orange); /* Using the main accent color */
+            --banner-emergency: #D32F2F;
+            --banner-deadline: var(--accent-orange);
             --banner-news-updates: #2C2C2C;
-            --banner-memo: #2E7D32; /* Retained a green for memos */
-            --banner-notices: #FBC02D; /* A yellow that complements orange */
+            --banner-memo: #2E7D32;
+            --banner-notices: #FBC02D;
         }
 
         * {
@@ -52,14 +49,14 @@
             flex-wrap: wrap;
             gap: 20px;
             margin-bottom: 30px;
-            border-bottom: 1px solid var(--secondary-bg); /* Added a subtle separator */
+            border-bottom: 1px solid var(--secondary-bg);
             padding-bottom: 20px;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
-            background-color: transparent; /* Made logo background transparent */
+            background-color: transparent;
             padding: 8px 0;
             border-radius: 12px;
             gap: 12px;
@@ -67,10 +64,10 @@
         }
 
         .logo-text {
-            font-weight: 700; /* Bolder text */
+            font-weight: 700;
             font-size: 1.3rem;
         }
-        .logo-text span { /* Style for the "Hub" part */
+        .logo-text span {
             background-color: var(--accent-orange);
             color: var(--primary-bg);
             padding: 4px 8px;
@@ -81,6 +78,7 @@
         nav {
             display: flex;
             gap: 30px;
+            align-items: center;
         }
 
         nav a {
@@ -95,6 +93,68 @@
             color: var(--accent-orange);
         }
 
+        /* Profile Dropdown Styles */
+        .profile-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 25px;
+            transition: background-color 0.3s;
+        }
+
+        .profile-container:hover {
+            background-color: var(--secondary-bg);
+        }
+
+        .profile-name {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .profile-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-orange);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 110%;
+            background-color: var(--secondary-bg);
+            min-width: 180px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            border: 1px solid var(--accent-orange);
+            overflow: hidden;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--accent-orange);
+            color: var(--primary-bg);
+        }
+
         .action-section {
             display: flex;
             align-items: center;
@@ -103,19 +163,19 @@
 
         .upload-btn {
             background-color: var(--accent-orange);
-            color: var(--primary-bg); /* Black text on orange button */
+            color: var(--primary-bg);
             text-decoration: none;
             display: inline-block;
             padding: 10px 25px;
-            border-radius: 8px; /* Sharper radius */
-            font-weight: 700; /* Bolder font */
+            border-radius: 8px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
             border: none;
         }
 
         .upload-btn:hover {
-            background-color: var(--text-primary); /* White on hover */
+            background-color: var(--text-primary);
         }
 
         .search-box {
@@ -135,7 +195,7 @@
 
         .search-box input:focus {
             width: 300px;
-            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.3); /* Orange focus shadow */
+            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.3);
             border-color: var(--accent-orange);
         }
 
@@ -207,11 +267,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: transparent; /* Removed filter bar background */
+            background-color: transparent;
             padding: 10px 0px;
             border-radius: 10px;
             margin-bottom: 30px;
-            border-top: 1px solid var(--secondary-bg); /* Added separators */
+            border-top: 1px solid var(--secondary-bg);
             border-bottom: 1px solid var(--secondary-bg);
         }
 
@@ -238,8 +298,8 @@
         }
         
         .filter-link.active-filter {
-            color: var(--primary-bg); /* Black text */
-            background-color: var(--accent-orange); /* Orange background */
+            color: var(--primary-bg);
+            background-color: var(--accent-orange);
             font-weight: 600;
         }
 
@@ -257,7 +317,7 @@
 
         .news-card {
             background-color: var(--secondary-bg);
-            border: 1px solid #333; /* Slightly lighter border */
+            border: 1px solid #333;
             padding: 20px;
             border-radius: 12px;
             display: flex;
@@ -332,7 +392,6 @@
             color: var(--text-secondary); 
         }
 
-        /* Highlight search terms */
         .highlight-text {
             background-color: rgba(255, 165, 0, 0.2);
             color: var(--text-primary);
@@ -431,6 +490,16 @@
             min-height: 100px;
         }
 
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 10px auto;
+            display: block;
+            border: 3px solid var(--accent-orange);
+        }
+
         .form-actions {
             display: flex;
             gap: 15px;
@@ -512,6 +581,14 @@
                 <i class="fas fa-times clear-search" id="clearSearch" onclick="clearSearch()"></i>
             </div>
         </div>
+        <div class="profile-container" id="profile-container">
+            <span id="profile-name" class="profile-name">Loading...</span>
+            <img src="https://via.placeholder.com/40" alt="User Avatar" id="profile-avatar" class="profile-avatar">
+            <div class="dropdown-content" id="profile-dropdown-content">
+                <a href="#" onclick="event.preventDefault(); openEditProfileModal();">Edit Profile</a>
+                <a href="#" onclick="event.preventDefault(); handleLogout();">Log Out</a>
+            </div>
+        </div>
     </header>
 
     <main id="main-content" class="all-announcement">
@@ -537,6 +614,7 @@
         </div>
     </main>
 
+    <!-- Edit Announcement Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -579,11 +657,61 @@
         </div>
     </div>
 
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <span class="close-modal" onclick="closeEditProfileModal()">&times;</span>
+            </div>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label for="editFullName">Full Name *</label>
+                    <input type="text" id="editFullName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email *</label>
+                    <input type="email" id="editEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserType">User Type *</label>
+                    <select id="editUserType" required>
+                        <option value="">Select User Type</option>
+                        <!--<option value="Admin">Admin</option>-->
+                        <option value="Faculty">Faculty</option>
+                        <!--<option value="Staff">Staff</option>-->
+                        <option value="Officer">Officer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editAvatarFile">Profile Picture</label>
+                    <img id="avatarPreview" class="avatar-preview" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Avatar Preview">
+                    <input type="file" id="editAvatarFile" accept="image/*">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditProfileModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="profileSubmitBtn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
     // ============================================
     // SUPABASE CONFIGURATION
     // ============================================
+    const SUPABASE_URL = 'https://dqtictujkhxultwoaqaw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxdGljdHVqa2h4dWx0d29hcWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyOTU1MjksImV4cCI6MjA3Mzg3MTUyOX0.DsnJZ9ylCBlTeVp_KdgRq71cV0f7MojOfuWg1MVGS5I';
     
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ============================================
+    // GLOBAL VARIABLES
+    // ============================================
+    let currentCategory = 'all-announcement';
+    let allAnnouncements = [];
+    let currentSearchTerm = '';
+    let currentUserProfile = {};
 
     // ============================================
     // PAGE PROTECTION
@@ -612,38 +740,36 @@
     // ====================================================
     // AUTO LOGOUT AFTER 5 MINUTES OF INACTIVITY
     // ====================================================
-    const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
-let inactivityTimer;
+    const INACTIVITY_LIMIT = 5 * 60 * 1000;
+    let inactivityTimer;
 
-function logoutUser() {
-  alert("You have been logged out due to inactivity.");
-  localStorage.removeItem('loggedInUser');
-  localStorage.removeItem('lastActivity'); // clear the timestamp
-  window.location.href = 'faculty_login.html';
-}
+    function logoutUser() {
+        alert("You have been logged out due to inactivity.");
+        localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('lastActivity');
+        window.location.href = 'faculty_login.html';
+    }
 
-function resetInactivityTimer() {
-  clearTimeout(inactivityTimer);
-  localStorage.setItem('lastActivity', Date.now());
-  inactivityTimer = setTimeout(logoutUser, INACTIVITY_LIMIT);
-}
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        localStorage.setItem('lastActivity', Date.now());
+        inactivityTimer = setTimeout(logoutUser, INACTIVITY_LIMIT);
+    }
 
-// Check time difference when page loads
-window.onload = () => {
-  const lastActivity = localStorage.getItem('lastActivity');
-  if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
-    logoutUser(); // auto logout if 5 mins already passed while away
-  } else {
-    resetInactivityTimer();
-  }
-};
+    window.onload = () => {
+        const lastActivity = localStorage.getItem('lastActivity');
+        if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
+            logoutUser();
+        } else {
+            resetInactivityTimer();
+        }
+    };
 
-// Detect activity
-document.onmousemove = resetInactivityTimer;
-document.onkeypress = resetInactivityTimer;
-document.onclick = resetInactivityTimer;
-document.onscroll = resetInactivityTimer;
-document.ontouchstart = resetInactivityTimer;
+    document.onmousemove = resetInactivityTimer;
+    document.onkeypress = resetInactivityTimer;
+    document.onclick = resetInactivityTimer;
+    document.onscroll = resetInactivityTimer;
+    document.ontouchstart = resetInactivityTimer;
 
     // ============================================
     // LOGOUT FUNCTION
@@ -655,7 +781,51 @@ document.ontouchstart = resetInactivityTimer;
         
         console.log('🚪 Logging out...');
         localStorage.removeItem('loggedInUser');
-        window.location.href = 'landing_Page.html';
+        window.location.href = 'faculty_login.html';
+    }
+
+    // ============================================
+    // LOAD USER PROFILE
+    // ============================================
+    async function loadUserProfile() {
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        if (!loggedInUser?.email) return;
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('members')
+                .select('id, full_name, avatar_url, email, user_type')
+                .eq('email', loggedInUser.email)
+                .single();
+
+            if (error) throw error;
+
+            currentUserProfile = data;
+            document.getElementById('profile-name').textContent = data.full_name || 'User';
+            document.getElementById('profile-avatar').src = data.avatar_url || 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+            document.getElementById('profile-name').textContent = 'User';
+        }
+    }
+
+    // ============================================
+    // PROFILE MODAL FUNCTIONS
+    // ============================================
+    function openEditProfileModal() {
+        if (!currentUserProfile) return;
+        document.getElementById('editFullName').value = currentUserProfile.full_name || '';
+        document.getElementById('editEmail').value = currentUserProfile.email || '';
+        document.getElementById('editUserType').value = currentUserProfile.user_type || '';
+        document.getElementById('editAvatarFile').value = '';
+        document.getElementById('avatarPreview').src = currentUserProfile.avatar_url || 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+        document.getElementById('editProfileModal').classList.add('active');
+        document.getElementById('profile-dropdown-content').classList.remove('show');
+    }
+
+    function closeEditProfileModal() {
+        document.getElementById('editProfileModal').classList.remove('active');
     }
 
     // ============================================
@@ -666,88 +836,182 @@ document.ontouchstart = resetInactivityTimer;
     }
 
     // ============================================
-    // GLOBAL VARIABLES
-    // ============================================
-    let currentCategory = 'all-announcement';
-    let allAnnouncements = [];
-    let currentSearchTerm = '';
-
-    // ============================================
     // INITIALIZATION
     // ============================================
     document.addEventListener('DOMContentLoaded', () => {
         console.log('🚀 Dashboard initialized');
+        
+        loadUserProfile();
         loadAnnouncements();
+
+        // Profile dropdown toggle
+        const profileContainer = document.getElementById('profile-container');
+        const profileDropdown = document.getElementById('profile-dropdown-content');
+
+        if (profileContainer && profileDropdown) {
+            profileContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('show');
+            });
+
+            window.addEventListener('click', (e) => {
+                if (!profileContainer.contains(e.target)) {
+                    profileDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // Edit profile form submission
+        document.getElementById('editProfileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('profileSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            const fullName = document.getElementById('editFullName').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const userType = document.getElementById('editUserType').value;
+            const avatarFile = document.getElementById('editAvatarFile').files[0];
+
+            try {
+                let avatarUrl = currentUserProfile.avatar_url;
+
+                if (avatarFile) {
+                    const fileExt = avatarFile.name.split('.').pop();
+                    const fileName = `${currentUserProfile.id}_${Date.now()}.${fileExt}`;
+                    
+                    const { error: uploadError } = await supabaseClient.storage
+                        .from('Avatar')
+                        .upload(fileName, avatarFile, { upsert: true });
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: urlData } = supabaseClient.storage
+                        .from('Avatar')
+                        .getPublicUrl(fileName);
+                    
+                    avatarUrl = urlData.publicUrl;
+                }
+
+                const { error: updateError } = await supabaseClient
+                    .from('members')
+                    .update({
+                        full_name: fullName,
+                        email: email,
+                        user_type: userType,
+                        avatar_url: avatarUrl
+                    })
+                    .eq('id', currentUserProfile.id);
+
+                if (updateError) throw updateError;
+
+                alert('✅ Profile updated successfully!');
+                closeEditProfileModal();
+                await loadUserProfile();
+
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Failed to update profile: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Save Changes';
+            }
+        });
+
+        // Avatar preview
+        document.getElementById('editAvatarFile').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     });
 
-    // ============================================
-    // LOAD ANNOUNCEMENTS FROM SUPABASE
-    // ============================================
-    async function loadAnnouncements(category = 'all-announcement') {
-        try {
-            console.log('📡 Loading announcements for category:', category);
-            
-            let query = supabaseClient
-                .from('announcements')
-                .select('*')
-                .order('scheduled_date', { ascending: false });
+ // ============================================
+// LOAD ANNOUNCEMENTS WITH USER JOIN
+// ============================================
+async function loadAnnouncements(category = 'all-announcement') {
+    try {
+        console.log('📡 Loading announcements for category:', category);
+        
+        let query = supabaseClient
+            .from('announcements')
+            .select(`
+                *,
+                members:posted_by_user_id (
+                    full_name,
+                    avatar_url
+                )
+            `)
+            .order('scheduled_date', { ascending: false });
 
-            if (category !== 'all-announcement') {
-                query = query.ilike('category', category);
-            }
-
-            const { data, error } = await query;
-
-            if (error) {
-                console.error('❌ Supabase error:', error);
-                throw error;
-            }
-
-            console.log('✅ Loaded announcements:', data);
-            console.log('📊 Total found:', data ? data.length : 0);
-            
-            allAnnouncements = data || [];
-            
-            if (currentSearchTerm) {
-                searchAnnouncements();
-            } else {
-                displayAnnouncements(allAnnouncements);
-            }
-            
-        } catch (error) {
-            console.error('❌ Error loading announcements:', error);
-            document.getElementById('newsGrid').innerHTML = `
-                <div class="error">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                    <h3>Error Loading Announcements</h3>
-                    <p style="margin-top: 10px;">${error.message || 'Unknown error occurred'}</p>
-                    <p style="margin-top: 10px; font-size: 0.9rem;">Check browser console for details (F12)</p>
-                </div>
-            `;
+        if (category !== 'all-announcement') {
+            query = query.ilike('category', category);
         }
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('❌ Supabase error:', error);
+            throw error;
+        }
+
+        console.log('✅ Loaded announcements:', data);
+        console.log('📊 Total found:', data ? data.length : 0);
+        
+        allAnnouncements = data || [];
+        
+        if (currentSearchTerm) {
+            searchAnnouncements();
+        } else {
+            displayAnnouncements(allAnnouncements);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading announcements:', error);
+        document.getElementById('newsGrid').innerHTML = `
+            <div class="error">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                <h3>Error Loading Announcements</h3>
+                <p style="margin-top: 10px;">${error.message || 'Unknown error occurred'}</p>
+                <p style="margin-top: 10px; font-size: 0.9rem;">Check browser console for details (F12)</p>
+            </div>
+        `;
     }
+}
 
-    // ============================================
-    // DISPLAY ANNOUNCEMENTS IN GRID
-    // ============================================
-    function displayAnnouncements(announcements, searchTerm = '') {
-        const grid = document.getElementById('newsGrid');
-        
-        if (announcements.length === 0) {
-            if (searchTerm) {
-                grid.innerHTML = `
-                    <div class="loading">
-                        🔍 No results found for "${escapeHtml(searchTerm)}"
-                        <br><br>
-                        <button class="btn btn-primary" onclick="clearSearch()">Clear Search</button>
-                    </div>`;
-            } else {
-                grid.innerHTML = '<div class="loading">📭 No announcements found</div>';
-            }
-            return;
+// ============================================
+// DISPLAY ANNOUNCEMENTS WITH MEMBER DATA
+// ============================================
+function displayAnnouncements(announcements, searchTerm = '') {
+    const grid = document.getElementById('newsGrid');
+    
+    if (announcements.length === 0) {
+        if (searchTerm) {
+            grid.innerHTML = `
+                <div class="loading">
+                    🔍 No results found for "${escapeHtml(searchTerm)}"
+                    <br><br>
+                    <button class="btn btn-primary" onclick="clearSearch()">Clear Search</button>
+                </div>`;
+        } else {
+            grid.innerHTML = '<div class="loading">📭 No announcements found</div>';
         }
+        return;
+    }
+    
+    grid.innerHTML = announcements.map(announcement => {
+        // Get user data from the joined members table
+        const postedByUser = announcement.members;
+        const userName = postedByUser?.full_name || announcement.posted_by || 'Unknown User';
+        const userAvatar = postedByUser?.avatar_url || 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
         
-        grid.innerHTML = announcements.map(announcement => `
+        return `
             <div class="news-card" data-id="${announcement.id}">
                 <div class="card-header">
                     <i class="fas fa-pencil-alt" onclick="openEditModal(${announcement.id})"></i>
@@ -760,54 +1024,66 @@ document.ontouchstart = resetInactivityTimer;
                     <h3 class="title">${highlightText(escapeHtml(announcement.title), searchTerm)}</h3>
                     <p class="description">${highlightText(escapeHtml(announcement.description) || 'No description provided', searchTerm)}</p>
                     ${announcement.target_audience ? `<p class="date" style="margin-top: 10px;">👥 ${highlightText(escapeHtml(announcement.target_audience), searchTerm)}</p>` : ''}
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #333; font-size: 0.85rem; color: var(--text-secondary);">
+                        <img src="${escapeHtml(userAvatar)}" 
+                             alt="${escapeHtml(userName)}" 
+                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-orange);"
+                             onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
+                        <span>Posted by <strong>${highlightText(escapeHtml(userName), searchTerm)}</strong></span>
+                    </div>
                 </div>
                 <div class="card-footer">
                     <span class="category">${highlightText(escapeHtml(announcement.category), searchTerm)}</span>
                 </div>
             </div>
-        `).join('');
-    }
+        `;
+    }).join('');
+}
 
-    // ============================================
-    // ENHANCED SEARCH FUNCTIONALITY
-    // ============================================
-    function searchAnnouncements() {
-        const searchInput = document.getElementById('searchInput');
-        const clearBtn = document.getElementById('clearSearch');
-        const searchBadge = document.getElementById('searchBadge');
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        
-        currentSearchTerm = searchTerm;
-        
-        if (searchTerm) {
-            clearBtn.classList.add('visible');
-        } else {
-            clearBtn.classList.remove('visible');
-            searchBadge.style.display = 'none';
-            displayAnnouncements(allAnnouncements);
-            return;
-        }
-        
-        console.log('🔍 Searching for:', searchTerm);
-        
-        const filtered = allAnnouncements.filter(announcement => 
+// ============================================
+// SEARCH WITH USER DATA
+// ============================================
+function searchAnnouncements() {
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearSearch');
+    const searchBadge = document.getElementById('searchBadge');
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    
+    currentSearchTerm = searchTerm;
+    
+    if (searchTerm) {
+        clearBtn.classList.add('visible');
+    } else {
+        clearBtn.classList.remove('visible');
+        searchBadge.style.display = 'none';
+        displayAnnouncements(allAnnouncements);
+        return;
+    }
+    
+    console.log('🔍 Searching for:', searchTerm);
+    
+    const filtered = allAnnouncements.filter(announcement => {
+        const userName = announcement.members?.full_name || announcement.posted_by || '';
+        return (
             (announcement.title && announcement.title.toLowerCase().includes(searchTerm)) ||
             (announcement.description && announcement.description.toLowerCase().includes(searchTerm)) ||
             (announcement.category && announcement.category.toLowerCase().includes(searchTerm)) ||
-            (announcement.target_audience && announcement.target_audience.toLowerCase().includes(searchTerm))
+            (announcement.target_audience && announcement.target_audience.toLowerCase().includes(searchTerm)) ||
+            (userName && userName.toLowerCase().includes(searchTerm))
         );
-        
-        console.log(`📊 Found ${filtered.length} results`);
-        
-        if (filtered.length > 0) {
-            searchBadge.textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`;
-            searchBadge.style.display = 'inline-block';
-        } else {
-            searchBadge.style.display = 'none';
-        }
-        
-        displayAnnouncements(filtered, searchTerm);
+    });
+    
+    console.log(`📊 Found ${filtered.length} results`);
+    
+    if (filtered.length > 0) {
+        searchBadge.textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`;
+        searchBadge.style.display = 'inline-block';
+    } else {
+        searchBadge.style.display = 'none';
     }
+    
+    displayAnnouncements(filtered, searchTerm);
+}
 
     function clearSearch() {
         document.getElementById('searchInput').value = '';
@@ -982,13 +1258,6 @@ document.ontouchstart = resetInactivityTimer;
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
-</script>
+    </script>
 </body>
-
 </html>
-
-
-
-
-
-
