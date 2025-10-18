@@ -300,6 +300,26 @@
             color: var(--text-secondary); 
             line-height: 1.5; 
         }
+
+        /* Posted by section */
+        .posted-by {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #333;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .posted-by img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-orange);
+        }
         
         .card-footer { 
             margin-top: auto; 
@@ -497,6 +517,10 @@
                         <i class="fas fa-users"></i>
                         <span id="modalAudience"></span>
                     </div>
+                    <div class="meta-item" id="modalPostedByContainer" style="display: none;">
+                        <img id="modalPostedByAvatar" src="" alt="" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-orange);">
+                        <span>Posted by <strong id="modalPostedBy"></strong></span>
+                    </div>
                 </div>
                 <hr style="border: 1px solid var(--text-secondary); margin: 20px 0;">
                 <p class="description" id="modalDescription"></p>
@@ -514,13 +538,22 @@
             loadAnnouncements();
         });
 
+        // ============================================
+        // LOAD ANNOUNCEMENTS WITH USER JOIN
+        // ============================================
         async function loadAnnouncements(category = 'all-announcement') {
             try {
                 console.log('📡 Loading announcements for category:', category);
                 
                 let query = supabaseClient
                     .from('announcements')
-                    .select('*')
+                    .select(`
+                        *,
+                        members:posted_by_user_id (
+                            full_name,
+                            avatar_url
+                        )
+                    `)
                     .order('scheduled_date', { ascending: false });
 
                 if (category !== 'all-announcement') {
@@ -557,6 +590,9 @@
             }
         }
 
+        // ============================================
+        // DISPLAY ANNOUNCEMENTS WITH POSTED BY
+        // ============================================
         function displayAnnouncements(announcements, searchTerm = '') {
             const grid = document.getElementById('newsGrid');
             
@@ -576,6 +612,10 @@
             
             grid.innerHTML = announcements.map(announcement => {
                 const badgeClass = `badge-${announcement.category.toLowerCase().replace(' ', '-')}`;
+                const postedByUser = announcement.members;
+                const userName = postedByUser?.full_name || announcement.posted_by || 'Unknown User';
+                const userAvatar = postedByUser?.avatar_url || 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+                
                 return `
                 <div class="news-card ${searchTerm ? 'highlight' : ''}" onclick="openViewModal(${announcement.id})">
                     <span class="card-category-badge ${badgeClass}">${escapeHtml(announcement.category)}</span>
@@ -586,6 +626,12 @@
                         </p>
                         <h3 class="title">${highlightText(escapeHtml(announcement.title), searchTerm)}</h3>
                         <p class="description">${highlightText(truncateText(escapeHtml(announcement.description) || 'No description provided', 120), searchTerm)}</p>
+                        <div class="posted-by">
+                            <img src="${escapeHtml(userAvatar)}" 
+                                 alt="${escapeHtml(userName)}"
+                                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
+                            <span>Posted by <strong>${highlightText(escapeHtml(userName), searchTerm)}</strong></span>
+                        </div>
                     </div>
                     <div class="card-footer">
                         ${announcement.target_audience ? `
@@ -602,9 +648,16 @@
             `}).join('');
         }
 
+        // ============================================
+        // OPEN VIEW MODAL WITH POSTED BY
+        // ============================================
         function openViewModal(id) {
             const announcement = allAnnouncements.find(a => a.id === id);
             if (!announcement) return;
+            
+            const postedByUser = announcement.members;
+            const userName = postedByUser?.full_name || announcement.posted_by || 'Unknown User';
+            const userAvatar = postedByUser?.avatar_url || 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
             
             document.getElementById('modalTitle').textContent = announcement.title;
             document.getElementById('modalDate').textContent = formatDate(announcement.scheduled_date);
@@ -618,6 +671,13 @@
             } else {
                 audienceContainer.style.display = 'none';
             }
+
+            // Show posted by in modal
+            const postedByContainer = document.getElementById('modalPostedByContainer');
+            document.getElementById('modalPostedBy').textContent = userName;
+            document.getElementById('modalPostedByAvatar').src = userAvatar;
+            document.getElementById('modalPostedByAvatar').alt = userName;
+            postedByContainer.style.display = 'flex';
             
             document.getElementById('viewModal').classList.add('active');
         }
@@ -626,6 +686,9 @@
             document.getElementById('viewModal').classList.remove('active');
         }
 
+        // ============================================
+        // SEARCH WITH POSTED BY
+        // ============================================
         function searchAnnouncements() {
             const searchInput = document.getElementById('searchInput');
             const clearBtn = document.getElementById('clearSearch');
@@ -643,12 +706,16 @@
                 return;
             }
             
-            const filtered = allAnnouncements.filter(announcement => 
-                (announcement.title && announcement.title.toLowerCase().includes(searchTerm)) ||
-                (announcement.description && announcement.description.toLowerCase().includes(searchTerm)) ||
-                (announcement.category && announcement.category.toLowerCase().includes(searchTerm)) ||
-                (announcement.target_audience && announcement.target_audience.toLowerCase().includes(searchTerm))
-            );
+            const filtered = allAnnouncements.filter(announcement => {
+                const userName = announcement.members?.full_name || announcement.posted_by || '';
+                return (
+                    (announcement.title && announcement.title.toLowerCase().includes(searchTerm)) ||
+                    (announcement.description && announcement.description.toLowerCase().includes(searchTerm)) ||
+                    (announcement.category && announcement.category.toLowerCase().includes(searchTerm)) ||
+                    (announcement.target_audience && announcement.target_audience.toLowerCase().includes(searchTerm)) ||
+                    (userName && userName.toLowerCase().includes(searchTerm))
+                );
+            });
             
             if (filtered.length > 0) {
                 searchBadge.textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`;
@@ -754,4 +821,3 @@
 
 </body>
 </html>
-
