@@ -908,6 +908,7 @@
 
                 alert('✅ Profile updated successfully!');
                 closeEditProfileModal();
+                await loadAnnouncements(currentCategory);
                 await loadUserProfile();
 
             } catch (error) {
@@ -1261,3 +1262,4 @@ function searchAnnouncements() {
     </script>
 </body>
 </html>
+
