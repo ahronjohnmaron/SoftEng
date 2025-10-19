@@ -817,7 +817,13 @@
                 document.getElementById('searchInput').focus();
             }
         });
+        //'DOMContentLoaded' event listener update ito every 10sec
+setInterval(() => {
+    console.log('🔄 Auto-refreshing announcements every 10 seconds...');
+    loadAnnouncements(currentCategory);
+}, 10000); // 10000 milliseconds = 10 seconds
     </script>
 
 </body>
 </html>
+
