@@ -666,6 +666,7 @@
         let currentPage = 1;
         const itemsPerPage = 12;
 
+
         // ============================================
         // THEME TOGGLE FUNCTION
         // ============================================
@@ -687,6 +688,7 @@
             }
         }
 
+
         // Load saved theme on page load
         function loadTheme() {
             const savedTheme = localStorage.getItem('theme');
@@ -700,16 +702,18 @@
             }
         }
 
+
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🎓 Student Dashboard initialized');
             loadTheme();
             loadAnnouncements();
         });
 
+
         // ============================================
         // LOAD ANNOUNCEMENTS WITH USER JOIN
         // ============================================
-        async function loadAnnouncements(category = 'all-announcement') {
+        async function loadAnnouncements(category = 'all-announcement', preservePage = false) {
             try {
                 console.log('📡 Loading announcements for category:', category);
                 
@@ -724,26 +728,34 @@
                     `)
                     .order('scheduled_date', { ascending: false });
 
+
                 if (category !== 'all-announcement') {
                     query = query.ilike('category', category);
                 }
 
+
                 const { data, error } = await query;
+
 
                 if (error) {
                     console.error('❌ Supabase error:', error);
                     throw error;
                 }
 
+
                 console.log('✅ Loaded announcements:', data);
                 console.log('📊 Total found:', data ? data.length : 0);
                 
                 allAnnouncements = data || [];
                 filteredAnnouncements = data || [];
-                currentPage = 1;
+                
+                // MODIFIED: Only reset page if not preserving
+                if (!preservePage) {
+                    currentPage = 1;
+                }
                 
                 if (currentSearchTerm) {
-                    searchAnnouncements();
+                    searchAnnouncements(preservePage);
                 } else {
                     displayAnnouncements(filteredAnnouncements);
                     updatePagination();
@@ -761,6 +773,7 @@
             }
         }
 
+
         // ============================================
         // PAGINATION FUNCTIONS
         // ============================================
@@ -771,6 +784,7 @@
             const nextBtn = document.getElementById('next-btn');
             const paginationContainer = document.getElementById('pagination-container');
 
+
             if (totalPages <= 1) {
                 paginationContainer.style.display = 'none';
                 return;
@@ -778,8 +792,10 @@
                 paginationContainer.style.display = 'flex';
             }
 
+
             prevBtn.disabled = currentPage === 1;
             nextBtn.disabled = currentPage === totalPages;
+
 
             let pageNumbersHTML = '';
             
@@ -790,9 +806,11 @@
                 }
             }
 
+
             for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) {
                 pageNumbersHTML += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
             }
+
 
             if (currentPage < totalPages - 1) {
                 if (currentPage < totalPages - 2) {
@@ -801,8 +819,10 @@
                 pageNumbersHTML += `<button class="pagination-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
             }
 
+
             pageNumbersContainer.innerHTML = pageNumbersHTML;
         }
+
 
         function goToPage(page) {
             currentPage = page;
@@ -811,11 +831,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+
         function previousPage() {
             if (currentPage > 1) {
                 goToPage(currentPage - 1);
             }
         }
+
 
         function nextPage() {
             const totalPages = Math.ceil(filteredAnnouncements.length / itemsPerPage);
@@ -823,6 +845,7 @@
                 goToPage(currentPage + 1);
             }
         }
+
 
         // ============================================
         // DISPLAY ANNOUNCEMENTS WITH PAGINATION
@@ -888,6 +911,7 @@
             `}).join('');
         }
 
+
         // ============================================
         // OPEN VIEW MODAL WITH POSTED BY
         // ============================================
@@ -912,6 +936,7 @@
                 audienceContainer.style.display = 'none';
             }
 
+
             const postedByContainer = document.getElementById('modalPostedByContainer');
             document.getElementById('modalPostedBy').textContent = userName;
             document.getElementById('modalPostedByAvatar').src = userAvatar;
@@ -921,14 +946,16 @@
             document.getElementById('viewModal').classList.add('active');
         }
 
+
         function closeViewModal() {
             document.getElementById('viewModal').classList.remove('active');
         }
 
+
        // ============================================
 // SEARCH WITH PAGINATION
 // ============================================
-function searchAnnouncements() {
+function searchAnnouncements(preservePage = false) {
     const searchInput = document.getElementById('searchInput');
     const clearBtn = document.getElementById('clearSearch');
     const searchBadge = document.getElementById('searchBadge');
@@ -942,7 +969,9 @@ function searchAnnouncements() {
         clearBtn.classList.remove('visible');
         searchBadge.style.display = 'none';
         filteredAnnouncements = allAnnouncements;
-        currentPage = 1;
+        if (!preservePage) {
+            currentPage = 1;
+        }
         displayAnnouncements(filteredAnnouncements);
         updatePagination();
         return;
@@ -950,11 +979,10 @@ function searchAnnouncements() {
     
     console.log('🔍 Searching for:', searchTerm);
     
-    // MODIFIED PART IS HERE
     filteredAnnouncements = allAnnouncements.filter(announcement => {
         const userName = announcement.members?.full_name || announcement.posted_by || '';
-        // ADD THIS LINE: Create a searchable date string
         const formattedDate = formatDate(announcement.scheduled_date).toLowerCase();
+
 
         return (
             (announcement.title && announcement.title.toLowerCase().includes(searchTerm)) ||
@@ -962,7 +990,6 @@ function searchAnnouncements() {
             (announcement.category && announcement.category.toLowerCase().includes(searchTerm)) ||
             (announcement.target_audience && announcement.target_audience.toLowerCase().includes(searchTerm)) ||
             (userName && userName.toLowerCase().includes(searchTerm)) ||
-            // ADD THIS CONDITION: Check if the formatted date includes the search term
             (formattedDate && formattedDate.includes(searchTerm))
         );
     });
@@ -976,10 +1003,13 @@ function searchAnnouncements() {
         searchBadge.style.display = 'none';
     }
     
-    currentPage = 1;
+    if (!preservePage) {
+        currentPage = 1;
+    }
     displayAnnouncements(filteredAnnouncements, searchTerm);
     updatePagination();
 }
+
 
         function clearSearch() {
             document.getElementById('searchInput').value = '';
@@ -992,15 +1022,18 @@ function searchAnnouncements() {
             updatePagination();
         }
 
+
         function highlightText(text, searchTerm) {
             if (!searchTerm || !text) return text;
             const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
             return text.replace(regex, '<span class="highlight-text">$1</span>');
         }
 
+
         function escapeRegex(string) {
             return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
+
 
         async function showCategory(categoryId) {
             currentCategory = categoryId;
@@ -1037,6 +1070,7 @@ function searchAnnouncements() {
             await loadAnnouncements(categoryId);
         }
 
+
         function formatDate(dateString) {
             if (!dateString) return 'No date';
             const date = new Date(dateString);
@@ -1044,10 +1078,12 @@ function searchAnnouncements() {
             return date.toLocaleDateString('en-US', options);
         }
 
+
         function truncateText(text, maxLength) {
             if (text.length <= maxLength) return text;
             return text.substring(0, maxLength) + '...';
         }
+
 
         function escapeHtml(text) {
             if (!text) return '';
@@ -1060,6 +1096,7 @@ function searchAnnouncements() {
             };
             return String(text).replace(/[&<>"']/g, m => map[m]);
         }
+
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -1076,10 +1113,11 @@ function searchAnnouncements() {
             }
         });
 
-        // Auto-refresh every 10 seconds
+
+        // MODIFIED: Auto-refresh every 10 seconds while preserving page
         setInterval(() => {
-            console.log('🔄 Auto-refreshing announcements every 10 seconds...');
-            loadAnnouncements(currentCategory);
+            console.log(`🔄 Auto-refreshing announcements on page ${currentPage}...`);
+            loadAnnouncements(currentCategory, true); // Pass true to preserve page
         }, 10000);
     </script>
 
