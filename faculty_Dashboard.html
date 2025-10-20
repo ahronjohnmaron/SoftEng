@@ -1107,7 +1107,7 @@
 // ============================================
 // LOAD ANNOUNCEMENTS WITH USER JOIN
 // ============================================
-async function loadAnnouncements(category = 'all-announcement') {
+async function loadAnnouncements(category = 'all-announcement', preservePage = false) {
     try {
         console.log('📡 Loading announcements for category:', category);
         
@@ -1138,10 +1138,13 @@ async function loadAnnouncements(category = 'all-announcement') {
         
         allAnnouncements = data || [];
         filteredAnnouncements = data || [];
-        currentPage = 1;
+        // Only reset to page 1 if not preserving page state
+if (!preservePage) {
+    currentPage = 1;
+}
         
         if (currentSearchTerm) {
-            searchAnnouncements();
+    searchAnnouncements(preservePage);
         } else {
             displayAnnouncements(filteredAnnouncements);
             updatePagination();
@@ -1293,7 +1296,7 @@ function displayAnnouncements(announcements, searchTerm = '') {
 // ============================================
 // SEARCH WITH PAGINATION
 // ============================================
-function searchAnnouncements() {
+function searchAnnouncements(preservePage = false) {
     const searchInput = document.getElementById('searchInput');
     const clearBtn = document.getElementById('clearSearch');
     const searchBadge = document.getElementById('searchBadge');
@@ -1307,7 +1310,9 @@ function searchAnnouncements() {
         clearBtn.classList.remove('visible');
         searchBadge.style.display = 'none';
         filteredAnnouncements = allAnnouncements;
-        currentPage = 1;
+        if (!preservePage) {
+    currentPage = 1;
+}
         displayAnnouncements(filteredAnnouncements);
         updatePagination();
         return;
@@ -1341,7 +1346,9 @@ function searchAnnouncements() {
         searchBadge.style.display = 'none';
     }
     
+    if (!preservePage) {
     currentPage = 1;
+}
     displayAnnouncements(filteredAnnouncements, searchTerm);
     updatePagination();
 }
@@ -1525,9 +1532,9 @@ function searchAnnouncements() {
     }
     //'DOMContentLoaded' event listener update ito every 10sec
 setInterval(() => {
-    console.log('🔄 Auto-refreshing announcements every 10 seconds...');
-    loadAnnouncements(currentCategory);
-}, 10000); // 10000 milliseconds = 10 seconds
+    console.log(`🔄 Auto-refreshing announcements on page ${currentPage}...`);
+    loadAnnouncements(currentCategory, true); // Pass true to preserve current page
+}, 10000);
     </script>
 </body>
 </html>
